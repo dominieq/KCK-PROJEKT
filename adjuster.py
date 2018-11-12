@@ -25,11 +25,6 @@ def order_points(pts):
 	rightMost = rightMost[np.argsort(rightMost[:, 1]), :]
 	(tr, br) = rightMost
 
-	# #we can count the distance between top left corner and right corners
-	# #bigger distance will show us the buttom right corner 
-	# D = dist.cdist(tl[np.newaxis], rightMost, "euclidean")[0]
-	# (br, tr) = rightMost[np.argsort(D)[::-1], :]
-
 	return np.array([tl, tr, br, bl], dtype="float32")
 
 def extract_sheet(image, pts):
@@ -67,10 +62,6 @@ def display_image(title, img):
 		cv2.destroyAllWindows()
 
 def main():
-	# ap = argparse.ArgumentParser()
-	# ap.add_argument("-i", "--image", required = True,
-	# 	help = "Path to the image to be scanned")
-	# args = vars(ap.parse_args())
 
 	for i in [4,5,6,8,9,10,13,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]:
 		print(i)
@@ -81,7 +72,6 @@ def main():
 	
 		# load the image and resize it in order to
 		# increase accuracy of edge detection and speed up image processing
-		# image = cv2.imread(args["image"])	
 		image = cv2.imread(file)
 		ratio = image.shape[0] / 500.0  #it will allow us to work later on the original image
 		orig = image.copy()
@@ -91,11 +81,6 @@ def main():
 		gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 		gray = cv2.GaussianBlur(gray, (5, 5), 0) #remove high frequency noise
 		edged = cv2.Canny(gray, 75, 200)
-		
-		#show the original image and the edge detected image
-		# print("STEP 1: Edge Detection")
-		# display_image("Image", image)
-		# display_image("Edged", edged)
 
 		# find the largest contours
 		cnts = cv2.findContours(edged.copy(), cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
@@ -112,14 +97,6 @@ def main():
 				screenCnt = approx
 				break
 
-		# print("STEP 2: Find contours of paper")
-		# try:
-		# 	cv2.drawContours(image, [screenCnt], -1, (0, 255, 0), 2)
-		# except:
-		# 	print("Contour not found")
-		#	continue
-		# display_image("Outline", image)
-
 		#turn the sheet of paper using original image
 		warped = extract_sheet(orig, screenCnt.reshape(4, 2) * ratio)
 		
@@ -131,9 +108,5 @@ def main():
 		T = threshold_local(warped, 11, offset = 10, method = "gaussian")
 		warped = (warped > T).astype("uint8") * 255
 		cv2.imwrite("output/warped"+repr(i)+"_thr.jpg", warped)
-
-		# print("STEP 3: Apply perspective transform")
-		# display_image("Original", imutils.resize(orig, height = 650))
-		# display_image("Scanned", imutils.resize(warped, height = 650))
 
 main()
