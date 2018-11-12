@@ -61,22 +61,27 @@ def extract_sheet(image, pts):
 
 	return warped
 
+def display_image(title, img):
+		cv2.imshow(title, img)
+		cv2.waitKey(0) & 0xFF
+		cv2.destroyAllWindows()
+
 def main():
 	# ap = argparse.ArgumentParser()
 	# ap.add_argument("-i", "--image", required = True,
 	# 	help = "Path to the image to be scanned")
 	# args = vars(ap.parse_args())
 
-	# load the image and compute the ratio of the old height
-	# to the new height, clone it, and resize it in order to
-	# increase accuracy of edge detection and speed up image processing
-	# image = cv2.imread(args["image"])
 	for i in [4,5,6,8,9,10,13,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]:
 		print(i)
 		if i < 10:
 			file = "Resources/nutki_0"+repr(i)+".JPG"
 		else:
 			file = "Resources/nutki_"+repr(i)+".JPG"
+	
+		# load the image and resize it in order to
+		# increase accuracy of edge detection and speed up image processing
+		# image = cv2.imread(args["image"])	
 		image = cv2.imread(file)
 		ratio = image.shape[0] / 500.0  #it will allow us to work later on the original image
 		orig = image.copy()
@@ -89,38 +94,31 @@ def main():
 		
 		#show the original image and the edge detected image
 		# print("STEP 1: Edge Detection")
-		# cv2.imshow("Image", image)
-		# cv2.imshow("Edged", edged)
-		# cv2.waitKey(0) & 0xFF
-		# cv2.destroyAllWindows()
+		# display_image("Image", image)
+		# display_image("Edged", edged)
 
-		# find the contours in the edged image, keeping only the
-		# largest ones, and initialize the screen contour
+		# find the largest contours
 		cnts = cv2.findContours(edged.copy(), cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
 		cnts = cnts[0] if imutils.is_cv2() else cnts[1] #OpenCV 2.4 and OpenCV 3 return contours differently
 		cnts = sorted(cnts, key = cv2.contourArea, reverse = True)[:5]
 		
 		# loop over the contours
 		for c in cnts:
-			# approximate the contour
 			#check the length of the contour if it is closed
 			perimeter = cv2.arcLength(c, True) 
 			approx = cv2.approxPolyDP(c, 0.02 * perimeter, True)
-			# if our approximated contour has four points, then we
-			# can assume that we have found our screen
+		#four points found? assume it's our sheet of paper
 			if len(approx) == 4:
 				screenCnt = approx
 				break
-		
-		# show the contour (outline) of the piece of paper
+
 		# print("STEP 2: Find contours of paper")
 		# try:
 		# 	cv2.drawContours(image, [screenCnt], -1, (0, 255, 0), 2)
 		# except:
 		# 	print("Contour not found")
-		# cv2.imshow("Outline", image)
-		# cv2.waitKey(0) & 0xFF
-		# cv2.destroyAllWindows()
+		#	continue
+		# display_image("Outline", image)
 
 		#turn the sheet of paper using original image
 		warped = extract_sheet(orig, screenCnt.reshape(4, 2) * ratio)
@@ -133,11 +131,9 @@ def main():
 		T = threshold_local(warped, 11, offset = 10, method = "gaussian")
 		warped = (warped > T).astype("uint8") * 255
 		cv2.imwrite("output/warped"+repr(i)+"_thr.jpg", warped)
-		# show the original and scanned images
+
 		# print("STEP 3: Apply perspective transform")
-		# cv2.imshow("Original", imutils.resize(orig, height = 650))
-		# cv2.imshow("Scanned", imutils.resize(warped, height = 650))
-		# cv2.waitKey(0) & 0xFF
-		# cv2.destroyAllWindows()
+		# display_image("Original", imutils.resize(orig, height = 650))
+		# display_image("Scanned", imutils.resize(warped, height = 650))
 
 main()
