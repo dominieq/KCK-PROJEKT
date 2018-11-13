@@ -105,8 +105,16 @@ def main():
 		warped = cv2.cvtColor(warped, cv2.COLOR_BGR2GRAY)
 		warped = imutils.resize(warped, width=1000)
 		cv2.imwrite("output/warped"+repr(i)+"_gray.jpg", warped)
-		T = threshold_local(warped, 11, offset = 10, method = "gaussian")
-		warped = (warped > T).astype("uint8") * 255
-		cv2.imwrite("output/warped"+repr(i)+"_thr.jpg", warped)
 
+		T = threshold_local(warped, 11, offset = 10, method = "mean")#generic, mean, median
+		warped_mean = (warped > T).astype("uint8") * 255
+		cv2.imwrite("output/warped"+repr(i)+"_thr_mean.jpg", warped_mean)
+
+		T = threshold_local(warped, 11, offset = 10, method = "median")#generic, mean, median
+		warped_median = (warped > T).astype("uint8") * 255
+		cv2.imwrite("output/warped"+repr(i)+"_thr_median.jpg", warped_median)
+
+		T = threshold_local(warped, 11, offset = 10, method = "gaussian")#generic, mean, median
+		warped_gauss = (warped > T).astype("uint8") * 255
+		cv2.imwrite("output/warped"+repr(i)+"_thr.jpg", warped_gauss)
 main()
