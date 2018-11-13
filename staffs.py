@@ -3,20 +3,20 @@ import numpy as np
 
 from config import *
 from staff import Staff
-import staffs
+# import staffs
 
 def preprocess_image(image):
     gray = image.copy()
-    # _, thresholded = cv2.threshold(gray, THRESHOLD_MIN, THRESHOLD_MAX, cv2.THRESH_BINARY)
-    element = np.ones((1, 2))
-    # thresholded = cv2.erode(thresholded, element)
-    # edges = cv2.Canny(thresholded, 10, 100, apertureSize=3)
-    # return edges, thresholded
-    gray = cv2.erode(gray, element)
-    edges = cv2.Canny(gray, 10, 100, apertureSize=3)
+    _, thresholded = cv2.threshold(gray, THRESHOLD_MIN, THRESHOLD_MAX, cv2.THRESH_BINARY)
+    element = np.ones((3, 3))
+    thresholded = cv2.erode(thresholded, element)
+    edges = cv2.Canny(thresholded, 10, 100, apertureSize=3)
+    return edges, thresholded
+    # gray = cv2.erode(gray, element)
+    # edges = cv2.Canny(gray, 10, 100, apertureSize=3)
     # cv2.imshow("czary",gray)
     # cv2.waitKey(0) & 0xFF
-    return edges, gray
+    # return edges, gray
 
 
 def detect_lines(hough, image, nlines,i):
@@ -85,7 +85,7 @@ def draw_staffs(image, staffs,i):
 
 def get_staffs(image,i):
     
-    image = cv2.imread(image,0)
+    image = cv2.imread(image, 0)
     processed_image, thresholded = preprocess_image(image)
     hough = cv2.HoughLines(processed_image, 1, np.pi / 150, 200)
     all_lines, lines_image_color = detect_lines(hough, thresholded, 80,i)
@@ -94,5 +94,6 @@ def get_staffs(image,i):
     return [Staff(staff[0], staff[1]) for staff in staffs]
 
 for i in [4,5,6,8,9,10,13,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]:
-    get_staffs("output/warped"+repr(i)+"_thr_median.jpg",i)
+    get_staffs("output/warped"+repr(i)+"_gray.jpg",i)
+    # get_staffs("output/warped"+repr(i)+"_thr_median.jpg",i)
 # get_staffs("input/good/easy1.jpg")
