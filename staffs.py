@@ -3,23 +3,35 @@ import numpy as np
 
 from config import *
 from staff import Staff
-# import staffs
+from skimage.filters import threshold_local
 
-def preprocess_image(image):
-    gray = image.copy()
-    _, thresholded = cv2.threshold(gray, THRESHOLD_MIN, THRESHOLD_MAX, cv2.THRESH_BINARY)
-    element = np.ones((3, 3))
-    thresholded = cv2.erode(thresholded, element)
-    edges = cv2.Canny(thresholded, 10, 100, apertureSize=3)
-    return edges, thresholded
-    # gray = cv2.erode(gray, element)
-    # edges = cv2.Canny(gray, 10, 100, apertureSize=3)
-    # cv2.imshow("czary",gray)
-    # cv2.waitKey(0) & 0xFF
-    # return edges, gray
+def display_image(title, img):
+		cv2.imshow(title, img)
+		cv2.waitKey(0) & 0xFF
+		cv2.destroyAllWindows()
+
+def preprocess_image(image, i):
+	gray = image.copy()
+	element = np.ones((1, 2))
+	#bright images are processed more accurately with mean method and smaller range
+	if (np.mean(gray) < 190):
+		T = threshold_local(gray, 15, offset = 8, method = "median")#generic, mean, median, gaussian
+	else:
+		T = threshold_local(gray, 7, offset = 8, method = "mean")#generic, mean, median, gaussian
+	
+	thresholded = (gray > T).astype("uint8") * 255
+	cv2.imwrite("staffs/staffs"+repr(i)+"_thr.png", thresholded)
+
+	thresholded = cv2.erode(thresholded, element)
+	cv2.imwrite("staffs/staffs"+repr(i)+"_erode.png", thresholded)
+	
+	edges = cv2.Canny(thresholded, 10, 100, apertureSize=3)
+	cv2.imwrite("staffs/staffs"+repr(i)+"_canny.png", edges)
+
+	return edges, thresholded
 
 
-def detect_lines(hough, image, nlines,i):
+def detect_lines(hough, image, nlines, i):
     all_lines = set()
     width, height = image.shape
     # convert to color image so that you can see the lines
@@ -85,15 +97,16 @@ def draw_staffs(image, staffs,i):
 
 def get_staffs(image,i):
     
-    image = cv2.imread(image, 0)
-    processed_image, thresholded = preprocess_image(image)
-    hough = cv2.HoughLines(processed_image, 1, np.pi / 150, 200)
-    all_lines, lines_image_color = detect_lines(hough, thresholded, 80,i)
-    staffs = detect_staffs(all_lines)
-    draw_staffs(lines_image_color, staffs,i)
-    return [Staff(staff[0], staff[1]) for staff in staffs]
+	image = cv2.imread(image, 0)
+	print(np.mean(image))
+	processed_image, thresholded = preprocess_image(image,i)
+	hough = cv2.HoughLines(processed_image, 1, np.pi / 150, 200)
+	all_lines, lines_image_color = detect_lines(hough, thresholded, 80,i)
+	staffs = detect_staffs(all_lines)
+	draw_staffs(lines_image_color, staffs,i)
+	return [Staff(staff[0], staff[1]) for staff in staffs]
 
-for i in [4,5,6,8,9,10,13,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]:
+for i in [4,5,13,16,24,25]:
     get_staffs("output/warped"+repr(i)+"_gray.jpg",i)
     # get_staffs("output/warped"+repr(i)+"_thr_median.jpg",i)
 # get_staffs("input/good/easy1.jpg")
