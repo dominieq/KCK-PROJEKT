@@ -63,7 +63,8 @@ def display_image(title, img):
 
 def main():
 
-	for i in [4,5,6,8,9,10,13,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]:
+	# for i in [4,5,6,7,8,9,10,13,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]:
+	for i in range(4,31):
 		print(i)
 		if i < 10:
 			file = "Resources/nutki_0"+repr(i)+".JPG"
