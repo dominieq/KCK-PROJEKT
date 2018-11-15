@@ -62,58 +62,57 @@ def display_image(title, img):
 		cv2.destroyAllWindows()
 
 def adjust_photo(i):
-	# for i in [4,5,6,7,8,9,10,13,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]:
-	# for i in range(4,31):
-		print(i)
-		if i < 10:
-			file = "Resources/nutki_0"+repr(i)+".JPG"
-		else:
-			file = "Resources/nutki_"+repr(i)+".JPG"
-	
-		# load the image and resize it in order to
-		# increase accuracy of edge detection and speed up image processing
-		image = cv2.imread(file)
-		ratio = image.shape[0] / 500.0  #it will allow us to work later on the original image
-		orig = image.copy()
-		image = imutils.resize(image, height = 500)
+	if i < 10:
+		file = "Resources/nutki_0"+repr(i)+".JPG"
+	else:
+		file = "Resources/nutki_"+repr(i)+".JPG"
+
+	# load the image and resize it in order to
+	# increase accuracy of edge detection and speed up image processing
+	image = cv2.imread(file)
+	ratio = image.shape[0] / 500.0  #it will allow us to work later on the original image
+	orig = image.copy()
+	image = imutils.resize(image, height = 500)
+
+	# convert the image to grayscale, blur it, and find edges
+	gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+	gray = cv2.GaussianBlur(gray, (5, 5), 0) #remove high frequency noise
+	edged = cv2.Canny(gray, 75, 200)
+
+	# find the largest contours
+	cnts = cv2.findContours(edged.copy(), cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
+	cnts = cnts[0] if imutils.is_cv2() else cnts[1] #OpenCV 2.4 and OpenCV 3 return contours differently
+	cnts = sorted(cnts, key = cv2.contourArea, reverse = True)[:5]
+
+	# loop over the contours
+	for c in cnts:
+		#check the length of the contour if it is closed
+		perimeter = cv2.arcLength(c, True) 
+		approx = cv2.approxPolyDP(c, 0.02 * perimeter, True)
+	#four points found? assume it's our sheet of paper
+		if len(approx) == 4:
+			screenCnt = approx
+			break
+
+	#turn the sheet of paper using original image
+	warped = extract_sheet(orig, screenCnt.reshape(4, 2) * ratio)
+
+	# convert the warped image to grayscale, then threshold it
+	# to give it that 'black and white' paper effect
+	warped = cv2.cvtColor(warped, cv2.COLOR_BGR2GRAY)
+	warped = imutils.resize(warped, width=1000)
+	cv2.imwrite("output/warped"+repr(i)+"_gray.jpg", warped)
+
+	T = threshold_local(warped, 11, offset = 10, method = "mean")#generic, mean, median
+	warped_mean = (warped > T).astype("uint8") * 255
+	cv2.imwrite("output/warped"+repr(i)+"_thr_mean.jpg", warped_mean)
+
+	T = threshold_local(warped, 11, offset = 10, method = "median")#generic, mean, median
+	warped_median = (warped > T).astype("uint8") * 255
+	cv2.imwrite("output/warped"+repr(i)+"_thr_median.jpg", warped_median)
+
+	T = threshold_local(warped, 11, offset = 10, method = "gaussian")#generic, mean, median
+	warped_gauss = (warped > T).astype("uint8") * 255
+	cv2.imwrite("output/warped"+repr(i)+"_thr.jpg", warped_gauss)
 		
-		# convert the image to grayscale, blur it, and find edges
-		gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-		gray = cv2.GaussianBlur(gray, (5, 5), 0) #remove high frequency noise
-		edged = cv2.Canny(gray, 75, 200)
-
-		# find the largest contours
-		cnts = cv2.findContours(edged.copy(), cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
-		cnts = cnts[0] if imutils.is_cv2() else cnts[1] #OpenCV 2.4 and OpenCV 3 return contours differently
-		cnts = sorted(cnts, key = cv2.contourArea, reverse = True)[:5]
-		
-		# loop over the contours
-		for c in cnts:
-			#check the length of the contour if it is closed
-			perimeter = cv2.arcLength(c, True) 
-			approx = cv2.approxPolyDP(c, 0.02 * perimeter, True)
-		#four points found? assume it's our sheet of paper
-			if len(approx) == 4:
-				screenCnt = approx
-				break
-
-		#turn the sheet of paper using original image
-		warped = extract_sheet(orig, screenCnt.reshape(4, 2) * ratio)
-		
-		# convert the warped image to grayscale, then threshold it
-		# to give it that 'black and white' paper effect
-		warped = cv2.cvtColor(warped, cv2.COLOR_BGR2GRAY)
-		warped = imutils.resize(warped, width=1000)
-		cv2.imwrite("output/warped"+repr(i)+"_gray.jpg", warped)
-
-		T = threshold_local(warped, 11, offset = 10, method = "mean")#generic, mean, median
-		warped_mean = (warped > T).astype("uint8") * 255
-		cv2.imwrite("output/warped"+repr(i)+"_thr_mean.jpg", warped_mean)
-
-		T = threshold_local(warped, 11, offset = 10, method = "median")#generic, mean, median
-		warped_median = (warped > T).astype("uint8") * 255
-		cv2.imwrite("output/warped"+repr(i)+"_thr_median.jpg", warped_median)
-
-		T = threshold_local(warped, 11, offset = 10, method = "gaussian")#generic, mean, median
-		warped_gauss = (warped > T).astype("uint8") * 255
-		cv2.imwrite("output/warped"+repr(i)+"_thr.jpg", warped_gauss)
+	return warped

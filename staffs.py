@@ -97,7 +97,6 @@ def draw_staffs(image, staffs,i):
 
 
 def get_staffs(image,i):
-    image = cv2.imread(image, 0)
     try:
         print(np.mean(image))
     except:
@@ -109,11 +108,5 @@ def get_staffs(image,i):
     all_lines, lines_image_color = detect_lines(hough, thresholded, 80, i)
     staffs = detect_staffs(all_lines)
     draw_staffs(lines_image_color, staffs,i)
-    return thresholded, [Staff(staff[0], staff[1]) for staff in staffs]
-
-# # for i in [4,5,13,16,24,25]:
-# for i in range(1,31):
-#     get_staffs("output/warped"+repr(i)+"_gray.jpg",i)
-# # for i in range(5):
-#     # if i == 4:
-#     # get_staffs("output/warped4_gray.jpg",i)
+    
+    return [Staff(staff[0], staff[1]) for staff in staffs]
