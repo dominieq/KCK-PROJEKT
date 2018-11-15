@@ -61,10 +61,9 @@ def display_image(title, img):
 		cv2.waitKey(0) & 0xFF
 		cv2.destroyAllWindows()
 
-def main():
-
+def adjust_photo(i):
 	# for i in [4,5,6,7,8,9,10,13,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]:
-	for i in range(4,31):
+	# for i in range(4,31):
 		print(i)
 		if i < 10:
 			file = "Resources/nutki_0"+repr(i)+".JPG"
@@ -118,4 +117,3 @@ def main():
 		T = threshold_local(warped, 11, offset = 10, method = "gaussian")#generic, mean, median
 		warped_gauss = (warped > T).astype("uint8") * 255
 		cv2.imwrite("output/warped"+repr(i)+"_thr.jpg", warped_gauss)
-main()
