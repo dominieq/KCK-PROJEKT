@@ -26,10 +26,9 @@ def main():
                         if width < height:
                                 print(i)
                                 staffs = get_staffs(adjusted_image, i)
-                                jol, elo, siema = detect_blobs(adjusted_image, staffs)
-                                imutils.resize(jol, height = 600) 
-                                imutils.resize(elo, height = 600) 
-                                imutils.resize(siema, height = 600) 
-                                cv2.imwrite("blobs/"+repr(i)+".jpg", np.hstack((jol, elo, siema)))
+                                horizontal_removed = detect_blobs(adjusted_image, staffs)
+                                # cv2.imwrite("blobs/"+repr(i)+".jpg", np.hstack((jol, elo, siema)))
+                                cv2.imwrite("blobs/"+repr(i)+".jpg", horizontal_removed)
+
 
 main()

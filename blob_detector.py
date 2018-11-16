@@ -25,24 +25,11 @@ def detect_blobs(input_image, staffs):
     https://www.learnopencv.com/blob-detection-using-opencv-python-c/
     """
     im_with_blobs = input_image.copy()
-    # T = threshold_local(im_with_blobs, 11, offset = 20, method = "median")#generic, mean, median
-    # im_with_blobs = (im_with_blobs > T).astype("uint8") * 255
 
-    # im_inv = (255 - im_with_blobs)
-    # kernel = cv2.getStructuringElement(ksize=(1, int(im_inv.shape[0] / 500)), shape=cv2.MORPH_RECT)
-    # horizontal_lines = cv2.morphologyEx(im_inv, cv2.MORPH_OPEN, kernel)
-    # horizontal_lines = (255 - horizontal_lines)
+    horizontal_removed = l2 = remove_lines(im_with_blobs, "mean", size = 7, off = 20)
+    horizontal_removed = cv2.erode(horizontal_removed, np.ones((2, 2)))    
 
-    hl1 = remove_lines(im_with_blobs, "median", size = 9, off = 24)
-    hl1 = cv2.erode(hl1, np.ones((3, 3)))    
-    hl2 = remove_lines(im_with_blobs, "mean", size = 9, off = 20)
-    hl2 = cv2.erode(hl2, np.ones((2, 3)))    
-    hl3 = remove_lines(im_with_blobs, "gaussian", size = 7, off = 13)
-    hl3 = cv2.erode(hl3, np.ones((3, 3)))
-
-    # horizontal_lines = cv2.erode(horizontal_lines, np.ones((1, 1)))
-
-    return hl1, hl2, hl3
+    return horizontal_removed
 
     # im_with_blobs = vertical_lines
     # im_with_blobs = cv2.cvtColor(im_with_blobs, cv2.COLOR_GRAY2BGR)
