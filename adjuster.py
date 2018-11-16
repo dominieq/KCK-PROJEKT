@@ -97,22 +97,15 @@ def adjust_photo(i):
 	#turn the sheet of paper using original image
 	warped = extract_sheet(orig, screenCnt.reshape(4, 2) * ratio)
 
+	height, width, _= warped.shape
+	if height < width:
+		directory = "turned"
+	else:
+		directory = "output"
 	# convert the warped image to grayscale, then threshold it
 	# to give it that 'black and white' paper effect
 	warped = cv2.cvtColor(warped, cv2.COLOR_BGR2GRAY)
 	warped = imutils.resize(warped, width=1000)
-	cv2.imwrite("output/warped"+repr(i)+"_gray.jpg", warped)
-
-	T = threshold_local(warped, 11, offset = 10, method = "mean")#generic, mean, median
-	warped_mean = (warped > T).astype("uint8") * 255
-	cv2.imwrite("output/warped"+repr(i)+"_thr_mean.jpg", warped_mean)
-
-	T = threshold_local(warped, 11, offset = 10, method = "median")#generic, mean, median
-	warped_median = (warped > T).astype("uint8") * 255
-	cv2.imwrite("output/warped"+repr(i)+"_thr_median.jpg", warped_median)
-
-	T = threshold_local(warped, 11, offset = 10, method = "gaussian")#generic, mean, median
-	warped_gauss = (warped > T).astype("uint8") * 255
-	cv2.imwrite("output/warped"+repr(i)+"_thr.jpg", warped_gauss)
+	cv2.imwrite(directory+"/warped"+repr(i)+"_gray.jpg", warped)
 		
 	return warped
