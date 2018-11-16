@@ -24,6 +24,7 @@ def main():
                         adjusted_image = adjust_photo(i)
                         height, width = adjusted_image.shape
                         if width < height:
+                                print(i)
                                 staffs = get_staffs(adjusted_image, i)
                                 jol, elo, siema = detect_blobs(adjusted_image, staffs)
                                 imutils.resize(jol, height = 600) 

@@ -9,8 +9,8 @@ def display_image(title, img):
 		cv2.waitKey(0) & 0xFF
 		cv2.destroyAllWindows()
 
-def remove_lines(im_with_blobs, method):
-    T = threshold_local(im_with_blobs, 11, offset = 20, method = method)#generic, mean, median
+def remove_lines(im_with_blobs, method, size = 11, off = 10):
+    T = threshold_local(im_with_blobs, size, offset = off, method = method)#generic, mean, median
     im_with_blobs = (im_with_blobs > T).astype("uint8") * 255
 
     im_inv = (255 - im_with_blobs)
@@ -33,16 +33,16 @@ def detect_blobs(input_image, staffs):
     # horizontal_lines = cv2.morphologyEx(im_inv, cv2.MORPH_OPEN, kernel)
     # horizontal_lines = (255 - horizontal_lines)
 
-    hl1 = remove_lines(im_with_blobs, "median")
-    hl2 = remove_lines(im_with_blobs, "mean")
-    hl3 = remove_lines(im_with_blobs, "gaussian")
+    hl1 = remove_lines(im_with_blobs, "median", size = 9, off = 24)
+    hl1 = cv2.erode(hl1, np.ones((3, 3)))    
+    hl2 = remove_lines(im_with_blobs, "mean", size = 9, off = 20)
+    hl2 = cv2.erode(hl2, np.ones((2, 3)))    
+    hl3 = remove_lines(im_with_blobs, "gaussian", size = 7, off = 13)
+    hl3 = cv2.erode(hl3, np.ones((3, 3)))
+
     # horizontal_lines = cv2.erode(horizontal_lines, np.ones((1, 1)))
 
     return hl1, hl2, hl3
-    # return im_with_blobs, horizontal_lines
-
-    # cv2.imwrite("output/8a_lines_horizontal_removed.png", horizontal_lines)
-    #     cv2.imwrite("output/8a_lines_vertical_removed.png", vertical_lines)
 
     # im_with_blobs = vertical_lines
     # im_with_blobs = cv2.cvtColor(im_with_blobs, cv2.COLOR_GRAY2BGR)
