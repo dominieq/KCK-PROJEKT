@@ -6,9 +6,10 @@ from staff import Staff
 from skimage.filters import threshold_local
 
 def display_image(title, img):
-		cv2.imshow(title, img)
-		cv2.waitKey(0) & 0xFF
-		cv2.destroyAllWindows()
+    cv2.namedWindow(title, cv2.WINDOW_NORMAL)
+    cv2.imshow(title, img)
+    cv2.waitKey(0) & 0xFF
+    cv2.destroyAllWindows()
 
 def preprocess_image(image, i):
     gray = image.copy()

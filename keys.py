@@ -1,7 +1,7 @@
 import cv2
 import staffs as sts
-import staff as st
-from skimage import data, io, filters, exposure
+import blob_detector as bd
+import adjuster
 
 
 def findKey(title, yHigh, yLow, x, y):
@@ -18,6 +18,7 @@ def findKey(title, yHigh, yLow, x, y):
 
 
 for i in range(1, 31):
+    adjuster.adjust_photo(i)
     imgEx = cv2.imread("output/warped" + repr(i) + "_thr_median.jpg", 0)
     staves = sts.get_staffs("output/warped" + repr(i) + "_gray.jpg", i)
     try:
