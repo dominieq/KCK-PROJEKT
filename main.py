@@ -11,21 +11,24 @@ def display_images(title, img):
         cv2.waitKey(0) & 0xFF
         cv2.destroyAllWindows()
 
-#  7,11,15 are not adjusted properly
+# 7,11,15 are not adjusted properly
 # 29 is not read by staffs.py
 def main():
     # for i in range(30,32):
-    #     if i not in [7,11,29]:
+    #     if i not in [7,11,15,29]:
     #        adjusted_img = adjust_photo(i)
     #        if i != 29:
     #           thresholded_image, staffs = get_staffs(adjusted_img, i)
-            #   thresholded_image, staffs = get_staffs("output/warped"+repr(i)+"_gray.jpg", i)
-    i = 4
-    adjusted_image = cv2.imread("output/warped"+repr(i)+"_gray.jpg", 0)
-    # adjust_photo(i)
-    staffs = get_staffs(adjusted_image, i)
-    jol, elo = detect_blobs(adjusted_image, staffs)
-    blobs = [jol, elo, adjusted_image]
-    display_images("siema", blobs)
+        for i in range(4,32):
+                if i not in [7,11,15,29]:
+                        adjusted_image = adjust_photo(i)
+                        height, width = adjusted_image.shape
+                        if width < height:
+                                staffs = get_staffs(adjusted_image, i)
+                                jol, elo, siema = detect_blobs(adjusted_image, staffs)
+                                imutils.resize(jol, height = 600) 
+                                imutils.resize(elo, height = 600) 
+                                imutils.resize(siema, height = 600) 
+                                cv2.imwrite("blobs/"+repr(i)+".jpg", np.hstack((jol, elo, siema)))
 
 main()
