@@ -99,7 +99,7 @@ def draw_staffs(image, staffs,i):
 
 def get_staffs(image,i):
     try:
-        print(np.mean(image))
+        print('mean: '+repr(np.mean(image)) + ' std: '+ repr(np.std(image)) + ' m/s: ' + repr(np.mean(image)/np.std(image)))
     except:
         return
     processed_image, thresholded = preprocess_image(image,i)
