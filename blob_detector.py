@@ -26,59 +26,68 @@ def detect_blobs(input_image, staffs):
     """
     im_with_blobs = input_image.copy()
 
-    horizontal_removed = l2 = remove_lines(im_with_blobs, "mean", size = 7, off = 20)
-    horizontal_removed = cv2.erode(horizontal_removed, np.ones((2, 2)))    
+    horizontal_removed = remove_lines(im_with_blobs, "mean", size = 11, off = 20)
+    horizontal_removed = cv2.erode(horizontal_removed, np.ones((9, 5)))    
 
-    return horizontal_removed
+    # return horizontal_removed
 
     # im_with_blobs = vertical_lines
-    # im_with_blobs = cv2.cvtColor(im_with_blobs, cv2.COLOR_GRAY2BGR)
+    im_with_blobs = horizontal_removed
+    im_with_blobs = cv2.cvtColor(im_with_blobs, cv2.COLOR_GRAY2BGR)
 
-    # # Set up the SimpleBlobDetector with default parameters.
-    # params = cv2.SimpleBlobDetector_Params()
-    # params.filterByArea = True
-    # params.minArea = 225
-    # params.maxArea = 1500
-    # params.filterByCircularity = True
-    # params.minCircularity = 0.6
-    # params.filterByConvexity = True
-    # params.minConvexity = 0.9
-    # params.filterByInertia = True
-    # params.minInertiaRatio = 0.01
+    # Set up the SimpleBlobDetector with default parameters.
+    params = cv2.SimpleBlobDetector_Params()
+    params.minThreshold = 10
+    params.maxThreshold = 3000
+    params.minDistBetweenBlobs = 0
+    params.filterByArea = True
+    params.minArea = 250
+    params.maxArea = 700
+    params.filterByCircularity = False
+#     params.minCircularity = 0
+    params.filterByConvexity = False
+#     params.minConvexity = 0
+    params.filterByInertia = False
+#     params.minInertiaRatio = 0.01
 
-    # detector = cv2.SimpleBlobDetector_create(params)
-    # keypoints = detector.detect(im_with_blobs)
+    detector = cv2.SimpleBlobDetector_create(params)
+#     detector = cv2.SimpleBlobDetector_create()
+    keypoints = detector.detect(im_with_blobs)
 
-    # cv2.drawKeypoints(im_with_blobs, keypoints=keypoints, outImage=im_with_blobs, color=(0, 0, 255),
-    #                   flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
+    cv2.drawKeypoints(im_with_blobs, keypoints=keypoints, outImage=im_with_blobs, color=(0, 0, 255),
+                      flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
 
-    # if SAVING_IMAGES_STEPS:
-    #     cv2.imwrite("output/8b_with_blobs.jpg", im_with_blobs)
+    # cv2.imwrite("Witam.jpg", im_with_blobs)
+
+    # return horizontal_removed, im_with_blobs
 
     # '''
     # Here we enumerate notes.
     # '''
-    # staff_diff = 3 / 5 * (staffs[0].max_range - staffs[0].min_range)
-    # bins = [x for sublist in [[staff.min_range - staff_diff, staff.max_range + staff_diff] for staff in staffs] for x in
-    #         sublist]
+    staff_diff = 3 / 5 * (staffs[0].max_range - staffs[0].min_range)
+    # lista dwuelementowych list zawierających [min-diff, max+diff] - poszerzamy pięciolinię
+    #
+    bins = [x for sublist in [[staff.min_range - staff_diff, staff.max_range + staff_diff] for staff in staffs] for x in
+            sublist]
 
-    # keypoints_staff = np.digitize([key.pt[1] for key in keypoints], bins)
-    # sorted_notes = sorted(list(zip(keypoints, keypoints_staff)), key=lambda tup: (tup[1], tup[0].pt[0]))
+    keypoints_staff = np.digitize([key.pt[1] for key in keypoints], bins)
+    sorted_notes = sorted(list(zip(keypoints, keypoints_staff)), key=lambda tup: (tup[1], tup[0].pt[0]))
 
-    # im_with_numbers = im_with_blobs.copy()
+    im_with_numbers = im_with_blobs.copy()
 
-    # for idx, tup in enumerate(sorted_notes):
-    #     cv2.putText(im_with_numbers, str(idx), (int(tup[0].pt[0]), int(tup[0].pt[1])),
-    #                 fontFace=cv2.FONT_HERSHEY_SIMPLEX,
-    #                 fontScale=1, color=(255, 0, 0))
-    #     cv2.putText(im_with_blobs, str(tup[1]), (int(tup[0].pt[0]), int(tup[0].pt[1])),
-    #                 fontFace=cv2.FONT_HERSHEY_SIMPLEX,
-    #                 fontScale=1, color=(255, 0, 0))
-    # if SAVING_IMAGES_STEPS:
-    #     cv2.imwrite("output/8c_with_numbers.jpg", im_with_numbers)
-    #     cv2.imwrite("output/8d_with_staff_numbers.jpg", im_with_blobs)
+    for idx, tup in enumerate(sorted_notes):
+        cv2.putText(im_with_numbers, str(idx), (int(tup[0].pt[0]), int(tup[0].pt[1])),
+                    fontFace=cv2.FONT_HERSHEY_SIMPLEX,
+                    fontScale=1, color=(255, 0, 0))
+        cv2.putText(im_with_blobs, str(tup[1]), (int(tup[0].pt[0]), int(tup[0].pt[1])),
+                    fontFace=cv2.FONT_HERSHEY_SIMPLEX,
+                    fontScale=1, color=(255, 0, 0))
 
-    # if VERBOSE:
-    #     print("Keypoints length : " + str(len(keypoints)))
+    cv2.imwrite("output/8c_with_numbers.jpg", im_with_numbers)
+    cv2.imwrite("output/8d_with_staff_numbers.jpg", im_with_blobs)
+
+    print("Keypoints length : " + str(len(keypoints)))
+
+    return horizontal_removed, im_with_blobs
 
     # return sorted_notes
