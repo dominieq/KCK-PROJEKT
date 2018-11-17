@@ -22,9 +22,9 @@ def main():
                         if width < height:
                                 print(i)
                                 staffs = get_staffs(adjusted_image, i)
-                                horizontal_removed, im_with_blobs, with_contours = detect_blobs(adjusted_image, staffs)
+                                horizontal_removed, with_contours = detect_blobs(adjusted_image, staffs)
                                 cv2.imwrite("blobs/"+repr(i)+".jpg", horizontal_removed)
-                                cv2.imwrite("blobs/"+repr(i)+"_bl.jpg", im_with_blobs)
+                                # cv2.imwrite("blobs/"+repr(i)+"_bl.jpg", im_with_blobs)
                                 cv2.imwrite("blobs/"+repr(i)+"_cnts.jpg", with_contours)
                                 
 
