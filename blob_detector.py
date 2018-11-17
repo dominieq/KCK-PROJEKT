@@ -2,12 +2,28 @@ import cv2
 import numpy as np
 from skimage.filters import threshold_local
 from config import *
-
+import imutils
 
 def display_image(title, img):
 		cv2.imshow(title, img)
 		cv2.waitKey(0) & 0xFF
 		cv2.destroyAllWindows()
+
+def find_contours(original, thresholded):
+    contours = cv2.findContours(thresholded, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    contours = contours[0] if imutils.is_cv2() else contours[1] #OpenCV 2.4 and OpenCV 3 return contours differently
+    contours_notes = []
+    for i in contours:
+            contour_perimeter = cv2.arcLength(i, True)
+            #whole note size
+            if 50 < contour_perimeter < 80:
+                contours_notes.append(i)
+    background = cv2.cvtColor(original, cv2.COLOR_GRAY2BGR)    
+    with_notes = cv2.drawContours(background, contours_notes, -1, (0,0,255), 2)
+    with_notes = imutils.resize(with_notes, height = 1000)
+#     display_image("siema",with_notes)
+    cv2.imwrite("blobs/")
+    return
 
 def remove_lines(im_with_blobs, method, size = 11, off = 10):
     T = threshold_local(im_with_blobs, size, offset = off, method = method)#generic, mean, median
@@ -27,10 +43,15 @@ def detect_blobs(input_image, staffs):
     im_with_blobs = input_image.copy()
 
     horizontal_removed = remove_lines(im_with_blobs, "mean", size = 11, off = 20)
-    horizontal_removed = cv2.erode(horizontal_removed, np.ones((9, 5)))    
+#     good version for blob detection below
+#     horizontal_removed = cv2.erode(horizontal_removed, np.ones((9, 5)))    
+    horizontal_removed_contours = cv2.erode(horizontal_removed, np.ones((7, 5)))    
 
-    # return horizontal_removed
+    find_contours(im_with_blobs, horizontal_removed_contours)
 
+#   better version of cv2.erode parameters for blob detection
+    horizontal_removed = cv2.erode(horizontal_removed, np.ones((9, 5)))
+    
     # im_with_blobs = vertical_lines
     im_with_blobs = horizontal_removed
     im_with_blobs = cv2.cvtColor(im_with_blobs, cv2.COLOR_GRAY2BGR)
@@ -43,6 +64,9 @@ def detect_blobs(input_image, staffs):
     params.filterByArea = True
     params.minArea = 250
     params.maxArea = 700
+#whole notes params
+#     params.minArea = 250
+#     params.maxArea = 410
     params.filterByCircularity = False
 #     params.minCircularity = 0
     params.filterByConvexity = False
