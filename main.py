@@ -16,7 +16,7 @@ def display_images(title, img):
 def main():
         for i in range(4,32):
                 if i not in [7,11,15,29]:
-                        # i = 4
+                        # i = 8
                         adjusted_image = adjust_photo(i)
                         height, width = adjusted_image.shape
                         if width < height:
