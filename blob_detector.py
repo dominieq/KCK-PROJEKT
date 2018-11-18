@@ -10,33 +10,6 @@ def display_image(title, img):
 		cv2.destroyAllWindows()
 
 
-# def count_notes_centre(contours, note_type):
-#     centres = []
-#     to_remove = []
-#     for cnt in contours:
-#         max_x = np.max([x[0][:][0] for x in cnt])
-#         min_x = np.min([x[0][:][0] for x in cnt])
-#         max_y = np.max([x[0][:][1] for x in cnt])
-#         min_y = np.min([x[0][:][1] for x in cnt])
-#         mid_x = (max_x+min_x)/2
-#         mid_y = (max_y+min_y)/2
-#         #detect key and remove its contour
-#         centres.append([mid_x,mid_y, note_type])
-#     return centres
-
-# def extract_type_of_notes(contours, min_size, max_size):
-#     notes_contours = []
-#     for cnt in contours:
-#         min_x = np.min([x[0][:][0] for x in cnt])
-#         if min_x > 130:
-#             contour_perimeter = cv2.arcLength(cnt, True)
-#             if min_size < contour_perimeter < max_size:
-#                 notes_contours.append(cnt)
-        
-#     return notes_contours
-
-##############################
-
 def extract_type_of_notes(contours, min_size, max_size, note_type):
     notes_contours = []
     centres = []
@@ -54,11 +27,6 @@ def extract_type_of_notes(contours, min_size, max_size, note_type):
                 notes_contours.append(cnt)
         
     return notes_contours, centres
-##############################
-
-
-
-
 
 def find_contours(original, thresholded, staffs):
     contours = cv2.findContours(thresholded, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
