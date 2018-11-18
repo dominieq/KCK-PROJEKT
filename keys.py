@@ -23,10 +23,9 @@ def writeName(img, places, photoId, whatType):
             cv2.putText(img, 'Klucz basowy', places[placeId], font, scale, color, typ)
     cv2.imwrite("keys/image_" + repr(photoId) + ".jpg", img)
 
+
 """ Finds a key on staves
 
-:param title - a title that will be displayed on an image
-    or  the name of saved file
 :param yHigh - stave.min_range
 :param yLow - stave.max_range
 :param x - width of an image
@@ -58,9 +57,9 @@ def findKey(yHigh, yLow, x, y, img):
 
 def processImage(index, imagePath, stavesPath):
 
-    adjuster.adjust_photo(index)
+    stavesImage = adjuster.adjust_photo(index)
     blockPrint()
-    staves = sts.get_staffs(cv2.imread(stavesPath, 0), index)
+    staves = sts.get_staffs(stavesImage, index)
     enablePrint()
     img = cv2.imread(imagePath, 0)
     places = []
