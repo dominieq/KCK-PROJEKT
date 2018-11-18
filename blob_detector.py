@@ -9,27 +9,71 @@ def display_image(title, img):
 		cv2.waitKey(0) & 0xFF
 		cv2.destroyAllWindows()
 
-def find_contours(original, thresholded, staffs):
-    contours = cv2.findContours(thresholded, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
-    #OpenCV 2.4 and OpenCV 3 return contours different way
-    contours = contours[0] if imutils.is_cv2() else contours[1] 
-    contours_notes = []
 
-    for cnt in contours:
-            contour_perimeter = cv2.arcLength(cnt, True)
-            #whole note size
-            if 55 < contour_perimeter < 85:
-                contours_notes.append(cnt)
+# def count_notes_centre(contours, note_type):
+#     centres = []
+#     to_remove = []
+#     for cnt in contours:
+#         max_x = np.max([x[0][:][0] for x in cnt])
+#         min_x = np.min([x[0][:][0] for x in cnt])
+#         max_y = np.max([x[0][:][1] for x in cnt])
+#         min_y = np.min([x[0][:][1] for x in cnt])
+#         mid_x = (max_x+min_x)/2
+#         mid_y = (max_y+min_y)/2
+#         #detect key and remove its contour
+#         centres.append([mid_x,mid_y, note_type])
+#     return centres
 
+# def extract_type_of_notes(contours, min_size, max_size):
+#     notes_contours = []
+#     for cnt in contours:
+#         min_x = np.min([x[0][:][0] for x in cnt])
+#         if min_x > 130:
+#             contour_perimeter = cv2.arcLength(cnt, True)
+#             if min_size < contour_perimeter < max_size:
+#                 notes_contours.append(cnt)
+        
+#     return notes_contours
+
+##############################
+
+def extract_type_of_notes(contours, min_size, max_size, note_type):
+    notes_contours = []
     centres = []
-    for cnt in contours_notes:
+    for cnt in contours:
         max_x = np.max([x[0][:][0] for x in cnt])
         min_x = np.min([x[0][:][0] for x in cnt])
         max_y = np.max([x[0][:][1] for x in cnt])
         min_y = np.min([x[0][:][1] for x in cnt])
-        mid_x = (max_x+min_x)/2
-        mid_y = (max_y+min_y)/2
-        centres.append([mid_x,mid_y])
+        if min_x > 130 and (max_x-min_x)>10 and (max_y-min_y)>10:
+            contour_perimeter = cv2.arcLength(cnt, True)
+            if min_size <= contour_perimeter <= max_size:
+                mid_x = (max_x+min_x)/2
+                mid_y = (max_y+min_y)/2
+                centres.append([mid_x,mid_y, note_type])
+                notes_contours.append(cnt)
+        
+    return notes_contours, centres
+##############################
+
+
+
+
+
+def find_contours(original, thresholded, staffs):
+    contours = cv2.findContours(thresholded, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
+    #OpenCV 2.4 and OpenCV 3 return contours different way
+    contours = contours[0] if imutils.is_cv2() else contours[1] 
+    full_notes, centres_full = extract_type_of_notes(contours, 55, 90, 0)
+    # centres_full = count_notes_centre(full_notes, 0)
+
+    eight_notes, centres_eights = extract_type_of_notes(contours, 110, 170, 3)
+    eight_notes = [cnt for cnt in eight_notes if ( np.max([x[0][:][0] for x in cnt]) - np.min([x[0][:][0] for x in cnt]) ) > 26 ]
+    # centres_eights = count_notes_centre(eight_notes, 3)
+
+    half_or_quarter, centres_hoq = extract_type_of_notes(contours, 91, 170, 2)
+    half_or_quarter = [cnt for cnt in half_or_quarter if ( np.max([x[0][:][0] for x in cnt]) - np.min([x[0][:][0] for x in cnt]) ) < 27 ]
+    # centres_hoq = count_notes_centre(half_or_quarter, 2)
 
     staff_diff = 3/5 * (staffs[0].max_range - staffs[0].min_range)
     staffs_coordinates = []
@@ -37,19 +81,21 @@ def find_contours(original, thresholded, staffs):
         staffs_coordinates.append(staff.min_range - staff_diff)
         staffs_coordinates.append(staff.max_range + staff_diff)
    
-    keypoints_staff = np.digitize([center[1] for center in centres], staffs_coordinates)
+    keypoints_staff = np.digitize([center[1] for center in centres_full], staffs_coordinates)
     keypoints_staff = [int((key+1)/2) for key in keypoints_staff]
 
-    sorted_notes = sorted(list(zip(centres, keypoints_staff)), key=lambda tup: (tup[1], tup[0][0]))
+    sorted_notes = sorted(list(zip(centres_full, keypoints_staff)), key=lambda tup: (tup[1], tup[0][0]))
 
     background =  cv2.cvtColor(original.copy(), cv2.COLOR_GRAY2BGR)
 
     for idx, tup in enumerate(sorted_notes):
-        cv2.putText(background, str(tup[1])+"|"+str(idx), (int(tup[0][0]), int(tup[0][1]-15)),
+        cv2.putText(background, str(tup[1])+"|"+str(idx)+"|"+str(tup[0][2]), (int(tup[0][0]-20), int(tup[0][1]-20)),
                     fontFace=cv2.FONT_HERSHEY_SIMPLEX,
                     fontScale=0.5, color=(0, 0, 255))
 
-    with_notes = cv2.drawContours(background, contours_notes, -1, (0,0,255), 2)
+    with_notes = cv2.drawContours(background, full_notes, -1, (0,0,255), 2)
+    with_notes = cv2.drawContours(with_notes, eight_notes, -1, (0,255,255), 2)   
+    with_notes = cv2.drawContours(with_notes, half_or_quarter, -1, (255,0,255), 2)    
     with_notes = imutils.resize(with_notes, height = 1000)
     return with_notes
 
@@ -71,7 +117,6 @@ def remove_lines(im_with_blobs, method, size = 11, off = 10):
     return horizontal_lines
 
 
-
 def detect_blobs(input_image, staffs):
    
     '''
@@ -81,7 +126,7 @@ def detect_blobs(input_image, staffs):
     im_with_blobs = input_image.copy()
 
     horizontal_removed = remove_lines(im_with_blobs, "mean", size = 11, off = 24) 
-    horizontal_removed = cv2.erode(horizontal_removed, np.ones((8, 6)))
+    horizontal_removed = cv2.erode(horizontal_removed, np.ones((9, 5)))
 
     # horizontal_removed_contours = cv2.erode(horizontal_removed, np.ones((7, 5)))    
 
