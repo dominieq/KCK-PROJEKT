@@ -1,15 +1,15 @@
 # Fdb version 3
-["bibtex sprawozdanie_kck"] 1542571481 "sprawozdanie_kck.aux" "sprawozdanie_kck.bbl" "sprawozdanie_kck" 1542571483
+["bibtex sprawozdanie_kck"] 1542571655 "sprawozdanie_kck.aux" "sprawozdanie_kck.bbl" "sprawozdanie_kck" 1542571656
   "/usr/share/texlive/texmf-dist/bibtex/bst/base/plain.bst" 1480098433 20613 bd3fbfa9f64872b81ac57a0dd2ed855f ""
   "references.bib" 0 -1 0 ""
-  "sprawozdanie_kck.aux" 1542571482 1050 addc67a965ffb64adb5c5b4fc1292958 ""
+  "sprawozdanie_kck.aux" 1542571655 1050 addc67a965ffb64adb5c5b4fc1292958 ""
   "sprawozdanie_kck.bcf" 0 -1 0 ""
   (generated)
   "sprawozdanie_kck.bbl"
   "sprawozdanie_kck.blg"
-["pdflatex"] 1542571481 "/home/kuba/KCK-PROJEKT/sprawozdanie_kck.tex" "sprawozdanie_kck.pdf" "sprawozdanie_kck" 1542571483
+["pdflatex"] 1542571655 "/home/kuba/KCK-PROJEKT/sprawozdanie_kck.tex" "sprawozdanie_kck.pdf" "sprawozdanie_kck" 1542571656
   "/etc/texmf/web2c/texmf.cnf" 1538923585 475 c0e671620eb5563b2130f56340a5fde8 ""
-  "/home/kuba/KCK-PROJEKT/sprawozdanie_kck.tex" 1542571481 2674 b6c8d1731ca59174ce24305b7ece6931 ""
+  "/home/kuba/KCK-PROJEKT/sprawozdanie_kck.tex" 1542571655 2859 f5bab42f958ec1beda2a94741aaace65 ""
   "/usr/share/texlive/texmf-dist/fonts/map/fontname/texfonts.map" 1511824771 3332 103109f5612ad95229751940c61aada0 ""
   "/usr/share/texlive/texmf-dist/fonts/tfm/jknappen/ec/ecrm1000.tfm" 1480098696 3584 adb004a0c8e7c46ee66cad73671f37b4 ""
   "/usr/share/texlive/texmf-dist/tex/context/base/mkii/supp-pdf.mkii" 1480098806 71627 94eb9990bed73c364d7f53f960cc8c5b ""
@@ -92,9 +92,9 @@
   "Resources/nutki_21.JPG" 1542038545 5274403 a80144ca3e9662ad2cdc1206db428cf0 ""
   "output/warped21_gray.jpg" 1542567423 341641 9486f6097c849fc12aaa361544b6c789 ""
   "output/warped4_gray.jpg" 1542567369 310215 a1548edea8c8a35e8e3102c3d5c76e06 ""
-  "sprawozdanie_kck.aux" 1542571482 1050 addc67a965ffb64adb5c5b4fc1292958 ""
+  "sprawozdanie_kck.aux" 1542571655 1050 addc67a965ffb64adb5c5b4fc1292958 ""
   "sprawozdanie_kck.bbl" 0 -1 0 "bibtex sprawozdanie_kck"
-  "sprawozdanie_kck.tex" 1542571481 2674 b6c8d1731ca59174ce24305b7ece6931 ""
+  "sprawozdanie_kck.tex" 1542571655 2859 f5bab42f958ec1beda2a94741aaace65 ""
   (generated)
   "sprawozdanie_kck.aux"
   "sprawozdanie_kck.pdf"
