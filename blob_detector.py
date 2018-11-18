@@ -18,7 +18,9 @@ def extract_type_of_notes(contours, min_size, max_size, note_type):
         min_x = np.min([x[0][:][0] for x in cnt])
         max_y = np.max([x[0][:][1] for x in cnt])
         min_y = np.min([x[0][:][1] for x in cnt])
-        if min_x > 130 and (max_x-min_x)>10 and (max_y-min_y)>10:
+        #min_x>110 - cut detected keys
+        #(max_x-min_x)>10 and (max_y-min_y)>10 - remove noise
+        if min_x > 110 and (max_x-min_x)>10 and (max_y-min_y)>10:
             contour_perimeter = cv2.arcLength(cnt, True)
             if min_size <= contour_perimeter <= max_size:
                 mid_x = (max_x+min_x)/2
@@ -32,16 +34,14 @@ def find_contours(original, thresholded, staffs):
     contours = cv2.findContours(thresholded, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
     #OpenCV 2.4 and OpenCV 3 return contours different way
     contours = contours[0] if imutils.is_cv2() else contours[1] 
+
     full_notes, centres_full = extract_type_of_notes(contours, 55, 90, 0)
-    # centres_full = count_notes_centre(full_notes, 0)
 
     eight_notes, centres_eights = extract_type_of_notes(contours, 110, 170, 3)
     eight_notes = [cnt for cnt in eight_notes if ( np.max([x[0][:][0] for x in cnt]) - np.min([x[0][:][0] for x in cnt]) ) > 26 ]
-    # centres_eights = count_notes_centre(eight_notes, 3)
 
     half_or_quarter, centres_hoq = extract_type_of_notes(contours, 91, 170, 2)
     half_or_quarter = [cnt for cnt in half_or_quarter if ( np.max([x[0][:][0] for x in cnt]) - np.min([x[0][:][0] for x in cnt]) ) < 27 ]
-    # centres_hoq = count_notes_centre(half_or_quarter, 2)
 
     staff_diff = 3/5 * (staffs[0].max_range - staffs[0].min_range)
     staffs_coordinates = []
