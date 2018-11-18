@@ -9,6 +9,37 @@ def display_image(title, img):
 		cv2.waitKey(0) & 0xFF
 		cv2.destroyAllWindows()
 
+def minims_and_quarters(original_image, contours, thresholded):
+    T = threshold_local(original_image, 11, offset = 12, method = "mean")
+    light_threshold = (original_image > T).astype("uint8") * 255
+    # light_threshold = cv2.erode(light_threshold, np.ones((1, 2)))
+    # light_threshold = cv2.drawContours(light_threshold, contours, -1, (0,0,255), 2)
+    # display_image("czary", light_threshold)
+    minims = []
+    quarters = []
+    for cnt in contours:
+        max_x = np.max([x[0][:][0] for x in cnt]) 
+        min_x = np.min([x[0][:][0] for x in cnt]) 
+        max_y = np.max([x[0][:][1] for x in cnt]) 
+        min_y = np.min([x[0][:][1] for x in cnt]) 
+        x_diff = max_x - min_x
+        y_diff = max_y - min_y
+        x1 = int(min_x + 0.2 * x_diff)
+        x2 = int(max_x - 0.3 * x_diff)
+        y1 = int(min_y + 0.55 * y_diff)
+        y2 = int(max_y - 0.1 * y_diff)
+        #find mean of note's inside
+        mean = np.mean(light_threshold[y1:y2, x1:x2])
+        # print(mean)
+        # mean = np.mean(light_threshold[min_y:max_y, min_x:max_x])
+        if mean > 140:
+            minims.append(cnt)
+        else:
+            quarters.append(cnt)
+        # display_image("jol",light_threshold[y1:y2, x1:x2])
+        
+    return minims, quarters
+
 
 def extract_type_of_notes(contours, min_size, max_size, note_type):
     notes_contours = []
@@ -40,8 +71,10 @@ def find_contours(original, thresholded, staffs):
     eight_notes, centres_eights = extract_type_of_notes(contours, 110, 170, 3)
     eight_notes = [cnt for cnt in eight_notes if ( np.max([x[0][:][0] for x in cnt]) - np.min([x[0][:][0] for x in cnt]) ) > 26 ]
 
-    half_or_quarter, centres_hoq = extract_type_of_notes(contours, 91, 170, 2)
-    half_or_quarter = [cnt for cnt in half_or_quarter if ( np.max([x[0][:][0] for x in cnt]) - np.min([x[0][:][0] for x in cnt]) ) < 27 ]
+    minim_or_quarter, centres_hoq = extract_type_of_notes(contours, 91, 170, 2)
+    minim_or_quarter = [cnt for cnt in minim_or_quarter if ( np.max([x[0][:][0] for x in cnt]) - np.min([x[0][:][0] for x in cnt]) ) < 27 ]
+
+    minims, quarters = minims_and_quarters(original, minim_or_quarter, thresholded)
 
     staff_diff = 3/5 * (staffs[0].max_range - staffs[0].min_range)
     staffs_coordinates = []
@@ -62,14 +95,17 @@ def find_contours(original, thresholded, staffs):
                     fontScale=0.5, color=(0, 0, 255))
 
     with_notes = cv2.drawContours(background, full_notes, -1, (0,0,255), 2)
-    with_notes = cv2.drawContours(with_notes, eight_notes, -1, (0,255,255), 2)   
-    with_notes = cv2.drawContours(with_notes, half_or_quarter, -1, (255,0,255), 2)    
-    with_notes = imutils.resize(with_notes, height = 1000)
+    with_notes = cv2.drawContours(with_notes, eight_notes, -1, (0,255,255), 2) 
+    with_notes = cv2.drawContours(with_notes, minims, -1, (255,0,255), 2)   
+    with_notes = cv2.drawContours(with_notes, quarters, -1, (255,255,0), 2)   
+    # with_notes = cv2.drawContours(with_notes, minim_or_quarter, -1, (255,0,255), 2)
+
     return with_notes
 
 
+
 def remove_lines(im_with_blobs, method, size = 11, off = 10):
-    T = threshold_local(im_with_blobs, size, offset = off, method = method)#generic, mean, median
+    T = threshold_local(im_with_blobs, size, offset = off, method = method)
     im_with_blobs = (im_with_blobs > T).astype("uint8") * 255
 
     height, _ = im_with_blobs.shape

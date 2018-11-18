@@ -55,13 +55,13 @@ def findKey(yHigh, yLow, x, y, img):
     return found, (xLeft, yHigh - propLow)
 
 
-def processImage(index, imagePath, stavesPath):
+def processImage(index):
 
-    stavesImage = adjuster.adjust_photo(index)
+    adjustedImage = adjuster.adjust_photo(index)
     blockPrint()
-    staves = sts.get_staffs(stavesImage, index)
+    staves = sts.get_staffs(adjustedImage, index)
     enablePrint()
-    img = cv2.imread(imagePath, 0)
+    img = cv2.erode(bd.remove_lines(adjustedImage, "mean", size = 11, off = 24), np.ones((9, 5)))
     places = []
     whatKey = []
 
@@ -86,12 +86,12 @@ def processImage(index, imagePath, stavesPath):
         
 
 
-for i in range(1, 31):
-    if i in [1, 2, 3, 7, 11, 12, 14, 15, 29]:
+for i in range(1, 43):
+    if i in [1, 2, 3, 7, 11, 15, 29, 32, 39]:
         continue
     else:
         print("Rozpoczynam wyszukiwanie w obrazie " + repr(i))
-        processImage(i, "staffs/staffs" + repr(i) + "_erode.png", "output/warped" + repr(i) + "_gray.jpg")
+        processImage(i)
     
         
    
