@@ -18,7 +18,7 @@ def find_contours(original, thresholded, staffs):
     for cnt in contours:
             contour_perimeter = cv2.arcLength(cnt, True)
             #whole note size
-            if 50 < contour_perimeter < 80:
+            if 55 < contour_perimeter < 85:
                 contours_notes.append(cnt)
 
     centres = []
@@ -58,8 +58,14 @@ def remove_lines(im_with_blobs, method, size = 11, off = 10):
     T = threshold_local(im_with_blobs, size, offset = off, method = method)#generic, mean, median
     im_with_blobs = (im_with_blobs > T).astype("uint8") * 255
 
+    height, _ = im_with_blobs.shape
+
+    #remove additional lines under the staffs
+    for i in range(int(0.90 * height), height):
+        im_with_blobs[i][:]=255
+
     im_inv = (255 - im_with_blobs)
-    kernel = cv2.getStructuringElement(ksize=(1, int(im_inv.shape[0] / 500)), shape=cv2.MORPH_RECT)
+    kernel = cv2.getStructuringElement(ksize=(1, int(im_inv.shape[0] / 650)), shape=cv2.MORPH_RECT)
     horizontal_lines = cv2.morphologyEx(im_inv, cv2.MORPH_OPEN, kernel)
     horizontal_lines = (255 - horizontal_lines)
     return horizontal_lines
@@ -67,19 +73,21 @@ def remove_lines(im_with_blobs, method, size = 11, off = 10):
 
 
 def detect_blobs(input_image, staffs):
-    """
-    Detects blobs with given parameters.
+   
+    '''
     https://www.learnopencv.com/blob-detection-using-opencv-python-c/
-    """
+    '''
+    
     im_with_blobs = input_image.copy()
 
-    horizontal_removed = remove_lines(im_with_blobs, "mean", size = 11, off = 20) 
-    horizontal_removed_contours = cv2.erode(horizontal_removed, np.ones((9, 5)))    
+    horizontal_removed = remove_lines(im_with_blobs, "mean", size = 11, off = 24) 
+    horizontal_removed = cv2.erode(horizontal_removed, np.ones((8, 6)))
+
     # horizontal_removed_contours = cv2.erode(horizontal_removed, np.ones((7, 5)))    
 
-    with_contours = find_contours(im_with_blobs, horizontal_removed_contours, staffs)
+    with_contours = find_contours(im_with_blobs, horizontal_removed, staffs)
 
-#   better version of cv2.erode parameters for blob detection
+    ## better version of cv2.erode parameters for blob detection
     # horizontal_removed = cv2.erode(horizontal_removed, np.ones((9, 5)))
     
     return horizontal_removed, with_contours
