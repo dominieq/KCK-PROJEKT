@@ -14,17 +14,17 @@ def display_images(title, img):
 # 7,11,15 are not adjusted properly
 # 29 is not read by staffs.py
 def main():
-        # for i in range(4,32):
-                # if i not in [7,11,15,29]:
-                        i = 4
+        for i in range(4,32):
+                if i not in [7,11,15,29]:
+                        # i = 4
                         adjusted_image = adjust_photo(i)
                         height, width = adjusted_image.shape
                         if width < height:
                                 print(i)
                                 staffs = get_staffs(adjusted_image, i)
-                                horizontal_removed, im_with_blobs, with_contours = detect_blobs(adjusted_image, staffs)
+                                horizontal_removed, with_contours = detect_blobs(adjusted_image, staffs)
                                 cv2.imwrite("blobs/"+repr(i)+".jpg", horizontal_removed)
-                                cv2.imwrite("blobs/"+repr(i)+"_bl.jpg", im_with_blobs)
+                                # cv2.imwrite("blobs/"+repr(i)+"_bl.jpg", im_with_blobs)
                                 cv2.imwrite("blobs/"+repr(i)+"_cnts.jpg", with_contours)
                                 
 
