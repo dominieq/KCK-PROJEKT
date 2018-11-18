@@ -12,11 +12,10 @@ def display_images(title, img):
         cv2.destroyAllWindows()
 
 # 7,11,15 are not adjusted properly
-# 29 is not read by staffs.py
+# 29,32,39 are not read by staffs.py
 def main():
-        for i in range(4,32):
-                if i not in [7,11,15,29]:
-                        # i = 8
+        for i in range(4,44):
+                if i not in [7,11,15,29,32,39]:
                         adjusted_image = adjust_photo(i)
                         height, width = adjusted_image.shape
                         if width < height:
@@ -24,7 +23,6 @@ def main():
                                 staffs = get_staffs(adjusted_image, i)
                                 horizontal_removed, with_contours = detect_blobs(adjusted_image, staffs)
                                 cv2.imwrite("blobs/"+repr(i)+".jpg", horizontal_removed)
-                                # cv2.imwrite("blobs/"+repr(i)+"_bl.jpg", im_with_blobs)
                                 cv2.imwrite("blobs/"+repr(i)+"_cnts.jpg", with_contours)
                                 
 
