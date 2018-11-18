@@ -103,7 +103,3 @@ venv.bak/
 # mypy
 .mypy_cache/
 
-staffs
-lines
-turned
-blobs
