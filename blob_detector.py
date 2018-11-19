@@ -55,7 +55,7 @@ def find_centres(contours, note_type):
         else: 
             y_cent = min_y + 3/4 * (max_y - min_y)
             if note_type in [1,2]:
-                x_cent = min_x + 1/3 * (max_x - min_x)
+                x_cent = min_x + 1/2 * (max_x - min_x)
             elif note_type == 3:            
                 x_cent = min_x + 1/4 * (max_x - min_x)
             else:
@@ -138,26 +138,37 @@ def find_contours(original, thresholded, staffs):
     '''
     tupple from 'sorted_notes' structure: ( [x_centre , y_centre , type], staff_num )
     '''
+    red = (0,0,255)
+    orange = (0,102,255)
+    blue = (255,0,0)
+    magenta = (255,0, 255)
+    staff_num = 0
+    diff = 0 #in case of changing staff subtract from current index the greatest index from previous staff 
     for idx, tup in enumerate(sorted_notes):
+        #set note num
+        if tup[1]!=staff_num:
+            staff_num = tup[1]
+            diff = idx - 1
+        #set color
         if tup[0][2] == 0:
-            color = (0,0,255)
+            color = red
         elif tup[0][2] == 1:
-            color = (255,0,255)
+            color = magenta
         elif tup[0][2] == 2:
-            color = (255,0,0)          
+            color = blue          
         else:
-            color = (0,255,0)
-        distance = 60
-        if idx % 2 == 0:
-            distance = distance - 10  
-        cv2.putText(background, str(tup[1])+"|"+str(idx)+"|"+str(tup[0][2]), (int(tup[0][0]-20), int(tup[0][1]-distance)),
+            color = orange
+        distance = 50
+        # if idx % 2 == 1:
+        #     distance = distance - 10  
+        cv2.putText(background, str(tup[0][2])+"|"+str(idx-diff)+".", (int(tup[0][0]-10), int(tup[0][1]-distance)),
                     fontFace=cv2.FONT_HERSHEY_SIMPLEX,
-                    fontScale=0.4, color=color)
+                    fontScale=0.3, color=color)
 
-    with_notes = cv2.drawContours(background, full_notes, -1, (0,0,255), 2)
-    with_notes = cv2.drawContours(with_notes, eight_notes, -1, (0,255,0), 2) 
-    with_notes = cv2.drawContours(with_notes, minim_notes, -1, (255,0,255), 2)   
-    with_notes = cv2.drawContours(with_notes, quarter_notes, -1, (255,0,0), 2)   
+    with_notes = cv2.drawContours(background, full_notes, -1, red, 2)
+    with_notes = cv2.drawContours(with_notes, eight_notes, -1, orange, 2) 
+    with_notes = cv2.drawContours(with_notes, minim_notes, -1, magenta, 2)   
+    with_notes = cv2.drawContours(with_notes, quarter_notes, -1, blue, 2)   
     # with_notes = cv2.drawContours(with_notes, minim_or_quarter, -1, (255,0,255), 2)
 
     return with_notes

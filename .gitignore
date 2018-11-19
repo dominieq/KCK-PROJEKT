@@ -103,3 +103,9 @@ venv.bak/
 # mypy
 .mypy_cache/
 
+blobs
+staffs
+keys
+output
+Resources
+__pycache__
