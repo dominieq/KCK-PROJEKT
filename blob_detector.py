@@ -8,7 +8,42 @@ def display_image(title, img):
 		cv2.imshow(title, img)
 		cv2.waitKey(0) & 0xFF
 		cv2.destroyAllWindows()
+def add_note_height(sorted_notes, staffs):
+    #([x,y,type],staff)
+    extended_notes = []
+    for note in sorted_notes:
+        if note[1]!=0:
+            diff = staffs[note[1]-1].max_range - staffs[note[1]-1].min_range
+            staff_top = staffs[note[1]-1].min_range - 0.1*diff
+            staff_bottom = staffs[note[1]-1].max_range + 0.1*diff
+            lines_space = (staff_bottom - staff_top)/4  
+            if note[0][1] >= staff_bottom:
+                print(note[0][1])
+                print("Bottom: "+str(staff_bottom))
+            elif  note[0][1] <= staff_top:
+                print(note[0][1])
+                print("top: "+str(staff_top))
+            detected = False
+            for i in range(0,4):
+                if (staff_bottom - i * lines_space) > note[0][1] > (staff_bottom - (i+1) * lines_space):
+                    new_note = ([note[0][0],note[0][1],note[0][2]], note[1], int(i+1))
+                    extended_notes.append(new_note)
+                    detected = True
+            if not detected:
+                new_note = ([note[0][0],note[0][1],note[0][2]], note[1], 0)
+                extended_notes.append(new_note)
+    return extended_notes
 
+def choose_note_color(note, staff_num):
+        if note[0][2] == 0:
+            color = (0,0,255) #red
+        elif note[0][2] == 1:
+            color = (255,0,255) #magenta
+        elif note[0][2] == 2:
+            color = (255,0,0) #blue         
+        else:
+            color = (0,102,255) #orange
+        return color
 
 def minims_and_quarters(original_image, contours):
     '''
@@ -53,7 +88,7 @@ def find_centres(contours, note_type):
             x_cent = (max_x + min_x)/2
             y_cent = (max_y + min_y)/2
         else: 
-            y_cent = min_y + 3/4 * (max_y - min_y)
+            y_cent = min_y + 0.7 * (max_y - min_y)
             if note_type in [1,2]:
                 x_cent = min_x + 1/2 * (max_x - min_x)
             elif note_type == 3:            
@@ -109,7 +144,7 @@ def find_contours(original, thresholded, staffs):
     minim_notes, quarter_notes = minims_and_quarters(original, minim_or_quarter)
     centres_mins = find_centres(minim_notes, 1)
     centres_quarts = find_centres(quarter_notes, 2)
-
+    centres_all = centres_full + centres_mins + centres_eights + centres_quarts
     '''
     make staff borders wider in case of notes laying under or over the staff
     '''
@@ -119,57 +154,39 @@ def find_contours(original, thresholded, staffs):
         staffs_coordinates.append(staff.min_range - staff_diff)
         staffs_coordinates.append(staff.max_range + staff_diff)
 
-    centres_all = centres_full + centres_mins + centres_eights + centres_quarts
     '''
     for each note find its staff
     '''
-    # keypoints_staff = np.digitize([center[1] for center in centres_full], staffs_coordinates)
-    # keypoints_staff = [int((key+1)/2) for key in keypoints_staff]
-
-    # sorted_notes = sorted(list(zip(centres_full, keypoints_staff)), key=lambda tup: (tup[1], tup[0][0]))
-
     keypoints_staff = np.digitize([center[1] for center in centres_all], staffs_coordinates)
     keypoints_staff = [int((key+1)/2) for key in keypoints_staff]
-
-    sorted_notes = sorted(list(zip(centres_all, keypoints_staff)), key=lambda tup: (tup[1], tup[0][0]))
-
+    
+    sorted_notes = sorted(list(zip(centres_all, keypoints_staff)), key=lambda note: (note[1], note[0][0]))
+    sorted_notes = add_note_height(sorted_notes, staffs)
+    
     background =  cv2.cvtColor(original.copy(), cv2.COLOR_GRAY2BGR)
 
     '''
     tupple from 'sorted_notes' structure: ( [x_centre , y_centre , type], staff_num )
     '''
-    red = (0,0,255)
-    orange = (0,102,255)
-    blue = (255,0,0)
-    magenta = (255,0, 255)
     staff_num = 0
     diff = 0 #in case of changing staff subtract from current index the greatest index from previous staff 
-    for idx, tup in enumerate(sorted_notes):
+    for idx, note in enumerate(sorted_notes):
         #set note num
-        if tup[1]!=staff_num:
-            staff_num = tup[1]
+        if note[1] != staff_num:
+            staff_num = note[1]
             diff = idx - 1
-        #set color
-        if tup[0][2] == 0:
-            color = red
-        elif tup[0][2] == 1:
-            color = magenta
-        elif tup[0][2] == 2:
-            color = blue          
-        else:
-            color = orange
+        color = choose_note_color(note, note[1])
         distance = 50
         # if idx % 2 == 1:
         #     distance = distance - 10  
-        cv2.putText(background, str(tup[0][2])+"|"+str(idx-diff)+".", (int(tup[0][0]-10), int(tup[0][1]-distance)),
+        cv2.putText(background, str(note[0][2])+"|"+str(idx-diff)+"|"+str(note[2])+".", (int(note[0][0]-10), int(note[0][1]-distance)),
                     fontFace=cv2.FONT_HERSHEY_SIMPLEX,
                     fontScale=0.3, color=color)
 
-    with_notes = cv2.drawContours(background, full_notes, -1, red, 2)
-    with_notes = cv2.drawContours(with_notes, eight_notes, -1, orange, 2) 
-    with_notes = cv2.drawContours(with_notes, minim_notes, -1, magenta, 2)   
-    with_notes = cv2.drawContours(with_notes, quarter_notes, -1, blue, 2)   
-    # with_notes = cv2.drawContours(with_notes, minim_or_quarter, -1, (255,0,255), 2)
+    with_notes = cv2.drawContours(background, full_notes, -1, (0,0,255), 2) # red
+    with_notes = cv2.drawContours(with_notes, eight_notes, -1, (0,102,255), 2) #orange
+    with_notes = cv2.drawContours(with_notes, minim_notes, -1, (255,0, 255), 2)   #magenta
+    with_notes = cv2.drawContours(with_notes, quarter_notes, -1, (255,0,0), 2) #blue   
 
     return with_notes
 
@@ -196,7 +213,9 @@ def detect_blobs(input_image, staffs):
     im_with_blobs = input_image.copy()
 
     horizontal_removed = remove_lines(im_with_blobs, "mean", size = 11, off = 24) 
+    # horizontal_removed = cv2.erode(horizontal_removed, np.ones((9, 5)))
     horizontal_removed = cv2.erode(horizontal_removed, np.ones((9, 5)))
+
 
     with_contours = find_contours(im_with_blobs, horizontal_removed, staffs)
     
