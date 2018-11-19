@@ -104,8 +104,11 @@ venv.bak/
 .mypy_cache/
 
 blobs
-staffs
+examples
 keys
 output
 Resources
+spraw
+staffs
+turned
 __pycache__
