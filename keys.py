@@ -15,12 +15,12 @@ def enablePrint():
 
 
 def writeName(img, places, photoId, whatType):
-    font, scale, color, typ = [cv2.FONT_HERSHEY_SIMPLEX, 1, (0,0,0), 2]
+    font, scale, color, typ = [cv2.FONT_HERSHEY_SIMPLEX, 1, (255,153,0), 2]
     for placeId in range(len(places)):
         if whatType[placeId]:
-            cv2.putText(img, 'Klucz wiolinowy', places[placeId], font, scale, color, typ)
+            cv2.putText(img, 'W', places[placeId], font, scale, color, typ)
         else:
-            cv2.putText(img, 'Klucz basowy', places[placeId], font, scale, color, typ)
+            cv2.putText(img, 'B', places[placeId], font, scale, color, typ)
     cv2.imwrite("keys/image_" + repr(photoId) + ".jpg", img)
 
 
@@ -40,7 +40,7 @@ def findKey(yHigh, yLow, x, y, img):
     
     img = cv2.cvtColor(img, cv2.COLOR_GRAY2RGB)
 
-    return found, (xLeft, yHigh - propLow)
+    return found, (xLeft, yHigh - propHigh)
 
 
 def processImage(index, img, staves, result):
