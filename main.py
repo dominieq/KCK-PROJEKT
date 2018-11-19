@@ -1,8 +1,10 @@
 from staffs import get_staffs
 from blob_detector import *
 from adjuster import adjust_photo
+import keys
 import numpy as np
 import imutils
+
 
 
 def display_images(title, img):
@@ -22,6 +24,7 @@ def main():
                                 print(i)
                                 staffs = get_staffs(adjusted_image, i)
                                 horizontal_removed, with_contours = detect_blobs(adjusted_image, staffs)
+                                keys.processImage(i, horizontal_removed, staffs, with_contours)
                                 cv2.imwrite("blobs/"+repr(i)+".jpg", horizontal_removed)
                                 cv2.imwrite("blobs/"+repr(i)+"_cnts.jpg", with_contours)
                                 

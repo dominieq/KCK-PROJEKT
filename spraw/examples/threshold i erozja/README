@@ -1,0 +1,8 @@
+    horizontal_removed = remove_lines(im_with_blobs, "mean", size = 7, off = 20)
+    horizontal_removed = cv2.erode(horizontal_removed, np.ones((1, 3)))    
+
+    horizontal_removed2 = remove_lines(im_with_blobs, "mean", size = 13, off = 23)
+    horizontal_removed2 = cv2.erode(horizontal_removed, np.ones((1, 1)))    
+
+
+Dają taki sami efekt

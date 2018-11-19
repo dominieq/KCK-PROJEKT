@@ -9,6 +9,7 @@ def display_image(title, img):
 		cv2.waitKey(0) & 0xFF
 		cv2.destroyAllWindows()
 
+
 def minims_and_quarters(original_image, contours):
     '''
     function divide minim_or_quarter list (contours argument) into minims_list and quarters_list 
@@ -29,6 +30,7 @@ def minims_and_quarters(original_image, contours):
         x2 = int(max_x - 0.3 * x_diff)
         y1 = int(min_y + 0.55 * y_diff)
         y2 = int(max_y - 0.1 * y_diff)
+
         '''
         find mean of note's inside
         '''
@@ -160,8 +162,6 @@ def find_contours(original, thresholded, staffs):
 
     return with_notes
 
-
-
 def remove_lines(im_with_blobs, method, size = 11, off = 10):
     T = threshold_local(im_with_blobs, size, offset = off, method = method)
     im_with_blobs = (im_with_blobs > T).astype("uint8") * 255
@@ -177,7 +177,6 @@ def remove_lines(im_with_blobs, method, size = 11, off = 10):
     kernel = cv2.getStructuringElement(ksize=(1, int(im_inv.shape[0] / 650)), shape=cv2.MORPH_RECT)
     horizontal_lines = cv2.morphologyEx(im_inv, cv2.MORPH_OPEN, kernel)
     horizontal_lines = (255 - horizontal_lines)
-
 
     return horizontal_lines
 
