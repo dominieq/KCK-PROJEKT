@@ -52,7 +52,7 @@ def processImage(index, img, staves, result):
     except:
         print("    [keys.py] Can't open file number " + repr(index))
     else:
-        print("    [keys.py] Plik " + repr(index) + " ma " + repr(len(staves)) + " pięciolini")
+        # print("    [keys.py] Plik " + repr(index) + " ma " + repr(len(staves)) + " pięciolini")
         args = list(img.shape)
         height, width, howManyKeys = [args[0], args[1], 0]
 
@@ -64,7 +64,7 @@ def processImage(index, img, staves, result):
 
             if isKey : howManyKeys = howManyKeys + 1 
         
-        print("        [keys.py] Znaleziono " + repr(howManyKeys) + " kluczy")
+        # print("        [keys.py] Znaleziono " + repr(howManyKeys) + " kluczy")
         writeName(result, places, index, whatKey)
         
 
@@ -73,7 +73,7 @@ def lookForKeys():
         if i in [1, 2, 3, 7, 11, 15, 29, 32, 39]:
             continue
         else:
-            print("[keys.py] Rozpoczynam wyszukiwanie w obrazie " + repr(i))
+            # print("[keys.py] Rozpoczynam wyszukiwanie w obrazie " + repr(i))
             processImage(i)
     
         
