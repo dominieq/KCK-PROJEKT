@@ -6,8 +6,9 @@
 \usepackage{lmodern}
 \selectlanguage{polish}
 
-\title{Komunikacja Człowiek-Komputer \newline rozpoznawanie nut}
-\author{Kuba Wąsik (132335), Dominik Szmyt (132326)}
+\title{Komunikacja Człowiek-Komputer \\
+rozpoznawanie nut}
+\author{Jakub Wąsik (132335), Dominik Szmyt (132326)}
 \date{18.11.2018}
 
 \usepackage{natbib}
@@ -16,6 +17,8 @@
 \usepackage{float}
 \usepackage{mwe}
 \usepackage[section]{placeins}
+\usepackage{caption}
+
 
 \begin{document}
 
@@ -33,115 +36,118 @@ Opiszemy najważniejsze kroki, jakie podjęliśmy, aby wykryć nuty.
 
 \subsection{Wycinanie strony}
 
-Pierwszym krokiem, który należało wykonać było "wyłuskanie" ~ ze zdjęcia samej kartki. 
+Pierwszym krokiem, który należało wykonać było ,,wyłuskanie'' ze zdjęcia samej kartki. 
 W tym celu poszukiwaliśmy największego konturu na obrazie, który ma cztery narożniki, zakładając, że to nasza kartka. 
 Aby było to możliwe, wcześniej nakładaliśmy filtr Canny. 
-Kiedy już odnaleźliśmy nasze narożniki, po odpowiednim ich posortowaniu używaliśmy dla nich funkcji \textbf{cv2.getPerspectiveTransform()}
-oraz \textbf{cv2.warpPerspective()}, aby odpowiednio znaleźć macierz transformacji i zastosować ją na zdjęciu. 
+Kiedy już odnaleźliśmy nasze narożniki, po odpowiednim ich posortowaniu używaliśmy dla nich funkcji dwóch funkcji. Pierwsza z nich oblicza macierz transformacji z czterech par odpowiadających sobie punktów, a druga stosuję ją na zdjęciu.
 
-\begin{figure}
+
+\begin{figure*}
     \centering
-    \begin{subfigure}{.5\textwidth}
+    \captionsetup[subfigure]{labelformat=empty}
+    \begin{subfigure}[b]{0.475\textwidth}
         \centering
         \graphicspath{ {Resources/} }
-        \includegraphics[width=.9\linewidth]{nutki_04.jpg}
-        % \caption{A subfigure}
-        \label{fig:sub1}
-    \end{subfigure}%
-    \begin{subfigure}{.5\textwidth}
+        \includegraphics[width=.9\textwidth]{nutki_04.jpg}
+        \caption{Rys. 1: Zdjęcie nr 4 bez przekształceń}
+        \label{fig1:sub1:original}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.475\textwidth}
         \centering
         \graphicspath{ {output/} }
-        \includegraphics[width=.9\linewidth]{warped4_gray.jpg}
-        % \caption{A subfigure}
-        \label{fig:sub2}
+        \includegraphics[width=.9\textwidth]{warped4_gray.jpg}
+        \caption{Rys. 2: Zdjęcie nr 4 po wycięciu}
+        \label{fig1:sub2:processed}
     \end{subfigure}
-    % \caption{Obraz oryginalny i po wycięciu}
-    \label{fig:test}
-\end{figure}
-\begin{figure}
-    \centering
-    \begin{subfigure}{.5\textwidth}
+    \label{fig1:firstExample}
+	\vskip\baselineskip
+    \begin{subfigure}[b]{0.475\textwidth}
         \centering
         \graphicspath{ {Resources/} }
-        \includegraphics[width=.9\linewidth]{nutki_21.jpg}
-        % \caption{A subfigure}
-        \label{fig:sub1}
-    \end{subfigure}%
-    \begin{subfigure}{.5\textwidth}
+        \includegraphics[width=.9\textwidth]{nutki_21.jpg}
+        \caption{Rys. 3: Zdjęcie nr 21 bez przekształceń}
+        \label{fig2:sub1}
+    \end{subfigure}
+    \quad
+    \begin{subfigure}[b]{0.475\textwidth}
         \centering
         \graphicspath{ {output/} }
-        \includegraphics[width=.9\linewidth]{warped21_gray.jpg}
-        % \caption{A subfigure}
-        \label{fig:sub2}
+        \includegraphics[width=.9\textwidth]{warped21_gray.jpg}
+        \caption{Rys. 4: Zdjęcie nr 21 po wycięciu}
+        \label{fig2:sub2}
     \end{subfigure}
-    \caption{Obraz oryginalny i po wycięciu}
-    \label{fig:test}
-\end{figure}
+    \label{fig2:secondExample}
+\end{figure*}
 
+\FloatBarrier
 
 \pagebreak
 
-\begin{flushleft}
-Nie dla wszystkich przypadków wykrywanie kartki zadziałało - dla nierównomiernego oświetlenia wykryte kontury kartki nie były zamknięte. 
-Efekt takiego wycięcia wyglądał tak:
-\end{flushleft}
 
+Nie dla wszystkich przypadków wykrywanie kartki zadziałało. Dla nierównomiernego oświetlenia wykryte kontury kartki nie były zamknięte. 
+Efekt takiego wycięcia jest pokazany na Rysunku 5.
+
+\captionsetup[figure]{labelformat=empty}
 \begin{figure}[h!]
-\centering
-\graphicspath{ {output/} }
-\includegraphics[scale=0.3]{warped15_gray.jpg}
-\caption{Nieudany przykład}
-\label{fig:universe}
+	\centering
+	\graphicspath{ {output/} }
+	\includegraphics[scale=0.3]{warped15_gray.jpg}
+	\caption{Rys. 5: Nieudany przykład}
+	\label{fig:universe}
 \end{figure}
 
 \pagebreak
 \subsection{Wykrywanie pięciolinii}
 
 Kolejnym zadaniem było wykrycie wysokości, na których znajdują się pięciolinie.
-Zastosowaliśmy do tego transformacje Hougha do wykrywania linii. Skorzystaliśmy z gotowej funkcji \textbf{cv2.HoughLines}.
+Zastosowaliśmy do tego transformacje Hougha do wykrywania linii.
 Jako jej parametry podaliśmy $\rho = 1 $ oraz $\theta = \pi / 100$ (ponieważ poszukujemy linii poziomych, kąt $\theta$ będzie niewielki, tak samo jak długość $\rho$).
 Wcześniej jednak trzeba było przetworzyć obraz za pomocą funkcji threshold\_local oraz nakładając filtr Canny. 
-Funkcja ta w zależności od jasności obrazu lepiej działała z parametrem 'method' ustawionym na 'median' albo 'mean'.
+Funkcja ta w zależności od jasności obrazu lepiej działała z parametrem `method' ustawionym na `median' albo `mean'.
 Zbyt duży threshold usuwał nutki, zbyt mały pozostawiał szumy i utrudniał wykrywanie nut.
-Ostatecznie wybraliśmy nieco mniejszy i dodaliśmy erozję (cv2.erode()).
+Ostatecznie wybraliśmy nieco mniejszy i dodaliśmy erozję.
 \newline
 
 \begin{figure}[H]
     \centering
+    \captionsetup[subfigure]{labelformat=empty}
     \begin{subfigure}{.5\textwidth}
         \centering
         \graphicspath{ {staffs/} }
         \includegraphics[width=\linewidth]{staffs4_thr.png}
-        \caption{Threshold}
+        \caption{Rys. 6: Threshold}
         \label{fig:sub1}
     \end{subfigure}%
+    \hfill
     \begin{subfigure}{.5\textwidth}
         \centering
         \graphicspath{ {staffs/} }
         \includegraphics[width=\linewidth]{staffs4_erode.png}
-        \caption{Erozja}
+        \caption{Rys. 7: Erozja}
         \label{fig:sub2}
     \end{subfigure}
-    % \caption{Obraz oryginalny i po wycięciu}
     \label{fig:test}
 \end{figure}
+
 \begin{figure}[H]
     \centering
+    \captionsetup[subfigure]{labelformat=empty}
     \begin{subfigure}{.5\textwidth}
         \centering
         \graphicspath{ {staffs/} }
         \includegraphics[width=.7\linewidth]{staffs4_canny.png}
-        \caption{Canny}
+        \caption{Rys. 8: Canny}
         \label{fig:sub1}
     \end{subfigure}%
+    \hfill
     \begin{subfigure}{.5\textwidth}
         \centering
         \graphicspath{ {staffs/} }
         \includegraphics[width=.7\linewidth]{staffs4_lines.png}
-        \caption{Wykryte linie}
+        \caption{Rys. 9: Wykryte linie}
         \label{fig:sub2}
     \end{subfigure}
-    % \caption{Obraz oryginalny i po wycięciu}
     \label{fig:test}
 \end{figure}
 
@@ -150,21 +156,21 @@ Sprawdzając odległość pomiędzy liniami, stwierdzamy, czy należą one do je
 Jeśli znajdziemy pięć równoległych, leżących blisko siebie linii, zakładamy, że krańcowe z nich są granicami jednej z pięciolinii. 
 Zwracamy obiekt Staff, który zawiera granice pięciolinii.
 
+\captionsetup[figure]{labelformat=empty}
 \begin{figure}[h!]
     \centering
     \graphicspath{ {staffs/} }
     \includegraphics[scale=0.15]{staffs4_done.png}
-    \caption{Wykryte pięciolinie}
+    \caption{Rys 10. Wykryte pięciolinie}
     \label{fig:universe}
     \end{figure}
 
 \subsection{Usuwanie pięciolinii}
 Kolejnym krokiem jest usunięcie pięciolinii w celu łatwego wykrycia konturów nut.
 W tym celu stosujemy na obrazie threshold, a następnie obracamy go w negatyw.
-Do usunięcia pięciolinii używamy funkcji \newline
-\textbf{cv2.getStructuringElement} oraz \textbf{cv2.morphologyEx}, 
+Do usunięcia pięciolinii używamy dwóch funkcji, 
 z których pierwsza tworzy element, który będzie wyszukiwany i usuwany (w naszym przypadku będzie to długi cieńki prostokąt), 
-a druga wykonuje wskazane przekształcenie morfologiczne (z parametrem \textbf{cv2.MORPH\_OPEN} wykonuje otwarcie - na zasadzie dylatacji)
+a druga wykonuje wskazane przekształcenie morfologiczne (z odpowiednim parametrem wykonuje otwarcie -- na zasadzie dylatacji).
 Kolejnym krokiem jest wykonanie dość silnej erozji, aby struktura nut była pełna.
 Następnie wyszukujemy kontury.
 W przypadku wyszukiwania nut okrajamy nieco kartkę (przypisuję barwę białą pewnym marginesom),
@@ -172,14 +178,15 @@ aby uniknąć wyszukania tekstu na dole strony i kluczy wiolinowych/basowych.
 Następnie kontury sortujemy po obwodach.
 Wykrycie nut całych i ósemek jest trywialne (przedziały odpowiednio najmniejszych i największych obwodów).
 W przypadku ćwierćnut i półnut, które mają ten sam rozmiar, sprawdzam średnią wartość fragmentu obrazu wydzielonego
-przez kontur nuty (półnuta jest biała w środku - średnia wartość znacznie wyższa).
+przez kontur nuty (półnuta jest biała w środku -- średnia wartość znacznie wyższa).
 \newline
 
+\captionsetup[figure]{labelformat=empty}
 \begin{figure}[H]
     \centering
     \graphicspath{ {blobs/} }
     \includegraphics[scale=0.15]{4.jpg}
-    \caption{Usunięte pięciolinie + silna erozja}
+    \caption{Rys. 11: Usunięte pięciolinie + silna erozja}
     \label{fig:universe}
     \end{figure}
 
@@ -190,30 +197,33 @@ Następnie, korzystając z różnic pomiędzy kluczem wiolinowym, a kluczem baso
 
 \begin{figure}[H]
     \centering
-    \begin{subfigure}{.5\textwidth}
+    \captionsetup[subfigure]{labelformat=empty}
+    \begin{subfigure}[b]{.5\textwidth}
         \centering
         \graphicspath{ {Resources/} }
         \includegraphics[width=.9\linewidth]{nutki_04.jpg}
+        \caption{Rys. 12: Zdjęcie nr 4 (łatwe)}
         \label{figsub1}
     \end{subfigure}%
-    \begin{subfigure}{.5\textwidth}
+    \begin{subfigure}[b]{.5\textwidth}
         \centering
         \graphicspath{ {keys/} }
         \includegraphics[width=.9\linewidth]{image_4.jpg}
+        \caption{Rys. 13: Zdjęcie nr 4 ze kluczami}
         \label{figsub2}
     \end{subfigure}
-    \caption{Obraz oryginalny nr 4 i i ze znalezionymi kluczami (łatwe)}
+    
     \label{figwykKlucze01}
 \end{figure}
 
 \begin{figure*}
     \centering
+    \captionsetup[subfigure]{labelformat=empty}
     \begin{subfigure}[b]{0.475\textwidth}
         \centering
         \graphicspath{ {Resources/} }
         \includegraphics[width=\textwidth]{nutki_17.jpg}
-        \caption[]%
-        {{\small Oryginalny obraz nr 17}}
+        \caption{Rys. 14: Zdjęcie nr 17 (średnie)}
         \label{fig:sub1}
     \end{subfigure}
     \hfill
@@ -221,8 +231,7 @@ Następnie, korzystając z różnic pomiędzy kluczem wiolinowym, a kluczem baso
         \centering
         \graphicspath{ {keys/} }
         \includegraphics[width=\textwidth]{image_17.jpg}
-        \caption[]%
-        {{\small i ze znalezionymi kluczami (średnie)}}
+        \caption{Rys. 15: Zdjęcie nr 17 z kluczami}
         \label{fig:sub2}
     \end{subfigure}
     \vskip\baselineskip
@@ -230,8 +239,7 @@ Następnie, korzystając z różnic pomiędzy kluczem wiolinowym, a kluczem baso
         \centering
         \graphicspath{ {Resources/} }
         \includegraphics[width=\textwidth]{nutki_30.jpg}
-        \caption[]%
-        {{\small Oryginalny obraz nr 30}}
+        \caption{Rys. 16: Zdjęcie nr 30 (trudne)}
         \label{fig:sub3}
     \end{subfigure}
     \quad
@@ -239,19 +247,13 @@ Następnie, korzystając z różnic pomiędzy kluczem wiolinowym, a kluczem baso
         \centering
         \graphicspath{ {keys/} }
         \includegraphics[width=\textwidth]{image_30.jpg}
-        \caption[]%
-        {{\small i ze znalezionymi kluczami (trudne)}}
+        \caption{Rys. 17: Zdjęcie nr 30 z kluczami}
         \label{fig:sub 4}
     \end{subfigure}
     \label{fig 1}
 \end{figure*}
 
 \FloatBarrier
-
-%\subsection{TO DO}
-%Odpowiednie podpisywanie nut \newline
-%Połączenie wykrywania klucza z wykrywaniem nut\newline
-%Uszczególnienie parametrów podziału nut na całe/półnuty/ćwierćnuty/ósemki\newline
 
 
 \section{Przykładowe wyniki}
@@ -260,12 +262,13 @@ Następnie, korzystając z różnic pomiędzy kluczem wiolinowym, a kluczem baso
 
 \begin{figure}[H]
     \centering
+    \captionsetup[subfigure]{labelformat=empty}
     \begin{subfigure}[b]{0.475\textwidth}
         \centering
         \graphicspath{ {Resources/} }
         \includegraphics[width=\textwidth]{nutki_04.jpg}
         \caption[]%
-        {{\small próbka 4 przed procesem}}
+        {{\small Rys. 18: Zdjęcie nr 4 przed procesem}}
         \label{fig:sub1}
     \end{subfigure}
     \hfill
@@ -274,7 +277,7 @@ Następnie, korzystając z różnic pomiędzy kluczem wiolinowym, a kluczem baso
         \graphicspath{ {blobs/} }
         \includegraphics[width=\textwidth]{4_cnts.jpg}
         \caption[]%
-        {{\small próbka 4 wynik}}
+        {{\small Rys. 19: Zdjęcie nr 4 wynik}}
         \label{fig:sub2}
     \end{subfigure}
 \end{figure}
@@ -282,12 +285,13 @@ Następnie, korzystając z różnic pomiędzy kluczem wiolinowym, a kluczem baso
 
 \begin{figure*}
     \centering
+    \captionsetup[subfigure]{labelformat=empty}
     \begin{subfigure}[b]{0.475\textwidth}
         \centering
         \graphicspath{ {Resources/} }
         \includegraphics[width=\textwidth]{nutki_05.jpg}
         \caption[]%
-        {{\small próbka 5 przed procesem}}
+        {{\small Rys. 20: Zdjęcie nr 5 przed procesem}}
         \label{fig:sub1}
     \end{subfigure}
     \hfill
@@ -296,7 +300,7 @@ Następnie, korzystając z różnic pomiędzy kluczem wiolinowym, a kluczem baso
         \graphicspath{ {blobs/} }
         \includegraphics[width=\textwidth]{5_cnts.jpg}
         \caption[]%
-        {{\small próbka 5 wynik}}
+        {{\small Rys. 21: Zdjęcie nr 5 wynik}}
         \label{fig:sub2}
     \end{subfigure}
     \vskip\baselineskip
@@ -305,7 +309,7 @@ Następnie, korzystając z różnic pomiędzy kluczem wiolinowym, a kluczem baso
         \graphicspath{ {Resources/} }
         \includegraphics[width=\textwidth]{nutki_06.jpg}
         \caption[]%
-        {{\small próbka 6 przed procesem}}
+        {{\small Rys. 22: Zdjęcie nr 6 przed procesem}}
         \label{fig:sub3}
     \end{subfigure}
     \quad
@@ -314,7 +318,7 @@ Następnie, korzystając z różnic pomiędzy kluczem wiolinowym, a kluczem baso
         \graphicspath{ {blobs/} }
         \includegraphics[width=\textwidth]{6_cnts.jpg}
         \caption[]%
-        {{\small próbka 6 wynik}}
+        {{\small Rys. 23: Zdjęcie nr 6 wynik}}
         \label{fig:sub 4}
     \end{subfigure}
     \label{fig 1}
@@ -324,12 +328,13 @@ Następnie, korzystając z różnic pomiędzy kluczem wiolinowym, a kluczem baso
 
 \begin{figure*}
     \centering
+    \captionsetup[subfigure]{labelformat=empty}
     \begin{subfigure}[b]{0.475\textwidth}
         \centering
         \graphicspath{ {Resources/} }
         \includegraphics[width=\textwidth]{nutki_08.jpg}
         \caption[]%
-        {{\small próbka 8 przed procesem}}
+        {{\small Rys. 24: Zdjęcie nr 8 przed procesem}}
         \label{fig:sub1}
     \end{subfigure}
     \hfill
@@ -338,7 +343,7 @@ Następnie, korzystając z różnic pomiędzy kluczem wiolinowym, a kluczem baso
         \graphicspath{ {blobs/} }
         \includegraphics[width=\textwidth]{8_cnts.jpg}
         \caption[]%
-        {{\small próbka 8 wynik}}
+        {{\small Rys. 25: Zdjęcie nr 8 wynik}}
         \label{fig:sub2}
     \end{subfigure}
     \vskip\baselineskip
@@ -347,7 +352,7 @@ Następnie, korzystając z różnic pomiędzy kluczem wiolinowym, a kluczem baso
         \graphicspath{ {Resources/} }
         \includegraphics[width=\textwidth]{nutki_13.jpg}
         \caption[]%
-        {{\small próbka 13 przed procesem}}
+        {{\small Rys. 26: Zdjęcie nr 13 przed procesem}}
         \label{fig:sub3}
     \end{subfigure}
     \quad
@@ -356,7 +361,7 @@ Następnie, korzystając z różnic pomiędzy kluczem wiolinowym, a kluczem baso
         \graphicspath{ {blobs/} }
         \includegraphics[width=\textwidth]{13_cnts.jpg}
         \caption[]%
-        {{\small próbka 13 wynik}}
+        {{\small Rys. 27: Zdjęcie nr 13 wynik}}
         \label{fig:sub 4}
     \end{subfigure}
     \label{fig 2}
@@ -368,12 +373,13 @@ Następnie, korzystając z różnic pomiędzy kluczem wiolinowym, a kluczem baso
 
 \begin{figure}[H]
     \centering
+    \captionsetup[subfigure]{labelformat=empty}
     \begin{subfigure}[b]{0.475\textwidth}
         \centering
         \graphicspath{ {Resources/} }
         \includegraphics[width=\textwidth]{nutki_16.jpg}
         \caption[]%
-        {{\small próbka 16 przed procesem}}
+        {{\small Rys. 28: Zdjęcie nr 16 przed procesem}}
         \label{fig:sub1}
     \end{subfigure}
     \hfill
@@ -382,7 +388,7 @@ Następnie, korzystając z różnic pomiędzy kluczem wiolinowym, a kluczem baso
         \graphicspath{ {blobs/} }
         \includegraphics[width=\textwidth]{16_cnts.jpg}
         \caption[]%
-        {{\small próbka 16 wynik}}
+        {{\small Rys. 29: Zdjęcie nr 16 wynik}}
         \label{fig:sub2}
     \end{subfigure}
 \end{figure}
@@ -390,12 +396,13 @@ Następnie, korzystając z różnic pomiędzy kluczem wiolinowym, a kluczem baso
 
 \begin{figure*}
     \centering
+    \captionsetup[subfigure]{labelformat=empty}
     \begin{subfigure}[b]{0.475\textwidth}
         \centering
         \graphicspath{ {Resources/} }
         \includegraphics[width=\textwidth]{nutki_17.jpg}
         \caption[]%
-        {{\small próbka 17 przed procesem}}
+        {{\small Rys. 30: Zdjęcie nr 17 przed procesem}}
         \label{fig:sub1}
     \end{subfigure}
     \hfill
@@ -404,7 +411,7 @@ Następnie, korzystając z różnic pomiędzy kluczem wiolinowym, a kluczem baso
         \graphicspath{ {blobs/} }
         \includegraphics[width=\textwidth]{17_cnts.jpg}
         \caption[]%
-        {{\small próbka 17 wynik}}
+        {{\small Rys. 31: Zdjęcie nr 17 wynik}}
         \label{fig:sub2}
     \end{subfigure}
     \vskip\baselineskip
@@ -413,7 +420,7 @@ Następnie, korzystając z różnic pomiędzy kluczem wiolinowym, a kluczem baso
         \graphicspath{ {Resources/} }
         \includegraphics[width=\textwidth]{nutki_20.jpg}
         \caption[]%
-        {{\small próbka 20 przed procesem}}
+        {{\small Rys. 32: Zdjęcie nr 20 przed procesem}}
         \label{fig:sub3}
     \end{subfigure}
     \quad
@@ -422,7 +429,7 @@ Następnie, korzystając z różnic pomiędzy kluczem wiolinowym, a kluczem baso
         \graphicspath{ {blobs/} }
         \includegraphics[width=\textwidth]{20_cnts.jpg}
         \caption[]%
-        {{\small próbka 20 wynik}}
+        {{\small Rys. 33: Zdjęcie nr 20 wynik}}
         \label{fig:sub 4}
     \end{subfigure}
     \label{fig 3}
@@ -432,12 +439,13 @@ Następnie, korzystając z różnic pomiędzy kluczem wiolinowym, a kluczem baso
 
 \begin{figure*}
     \centering
+    \captionsetup[subfigure]{labelformat=empty}
     \begin{subfigure}[b]{0.475\textwidth}
         \centering
         \graphicspath{ {Resources/} }
         \includegraphics[width=\textwidth]{nutki_21.jpg}
         \caption[]%
-        {{\small próbka 21 przed procesem}}
+        {{\small Rys. 34: Zdjęcie nr 21 przed procesem}}
         \label{fig:sub1}
     \end{subfigure}
     \hfill
@@ -446,7 +454,7 @@ Następnie, korzystając z różnic pomiędzy kluczem wiolinowym, a kluczem baso
         \graphicspath{ {blobs/} }
         \includegraphics[width=\textwidth]{21_cnts.jpg}
         \caption[]%
-        {{\small próbka 21 wynik}}
+        {{\small Rys. 35: Zdjęcie nr 21 wynik}}
         \label{fig:sub2}
     \end{subfigure}
     \vskip\baselineskip
@@ -455,7 +463,7 @@ Następnie, korzystając z różnic pomiędzy kluczem wiolinowym, a kluczem baso
         \graphicspath{ {Resources/} }
         \includegraphics[width=\textwidth]{nutki_41.jpg}
         \caption[]%
-        {{\small próbka 41 przed procesem}}
+        {{\small Rys. 36: Zdjęcie nr 41 przed procesem}}
         \label{fig:sub3}
     \end{subfigure}
     \quad
@@ -464,7 +472,7 @@ Następnie, korzystając z różnic pomiędzy kluczem wiolinowym, a kluczem baso
         \graphicspath{ {blobs/} }
         \includegraphics[width=\textwidth]{41_cnts.jpg}
         \caption[]%
-        {{\small próbka 41 wynik}}
+        {{\small Rys. 37: Zdjęcie nr 41 wynik}}
         \label{fig:sub 4}
     \end{subfigure}
     \label{fig 4}
@@ -476,12 +484,13 @@ Następnie, korzystając z różnic pomiędzy kluczem wiolinowym, a kluczem baso
 
 \begin{figure}[H]
     \centering
+    \captionsetup[subfigure]{labelformat=empty}
     \begin{subfigure}[b]{0.475\textwidth}
         \centering
         \graphicspath{ {Resources/} }
         \includegraphics[width=\textwidth]{nutki_26.jpg}
         \caption[]%
-        {{\small próbka 26 przed procesem}}
+        {{\small Rys. 38: Zdjęcie nr 26 przed procesem}}
         \label{fig:sub1}
     \end{subfigure}
     \hfill
@@ -490,7 +499,7 @@ Następnie, korzystając z różnic pomiędzy kluczem wiolinowym, a kluczem baso
         \graphicspath{ {blobs/} }
         \includegraphics[width=\textwidth]{26_cnts.jpg}
         \caption[]%
-        {{\small próbka 26 wynik}}
+        {{\small Rys. 39: Zdjęcie nr 26 wynik}}
         \label{fig:sub2}
     \end{subfigure}
 \end{figure}
@@ -498,12 +507,13 @@ Następnie, korzystając z różnic pomiędzy kluczem wiolinowym, a kluczem baso
 
 \begin{figure*}
     \centering
+    \captionsetup[subfigure]{labelformat=empty}
     \begin{subfigure}[b]{0.475\textwidth}
         \centering
         \graphicspath{ {Resources/} }
         \includegraphics[width=\textwidth]{nutki_27.jpg}
         \caption[]%
-        {{\small próbka 27 przed procesem}}
+        {{\small Rys. 40: Zdjęcie nr 27 przed procesem}}
         \label{fig:sub1}
     \end{subfigure}
     \hfill
@@ -512,7 +522,7 @@ Następnie, korzystając z różnic pomiędzy kluczem wiolinowym, a kluczem baso
         \graphicspath{ {blobs/} }
         \includegraphics[width=\textwidth]{27_cnts.jpg}
         \caption[]%
-        {{\small próbka 27 wynik}}
+        {{\small Rys. 41: Zdjęcie nr 27 wynik}}
         \label{fig:sub2}
     \end{subfigure}
     \vskip\baselineskip
@@ -521,7 +531,7 @@ Następnie, korzystając z różnic pomiędzy kluczem wiolinowym, a kluczem baso
         \graphicspath{ {Resources/} }
         \includegraphics[width=\textwidth]{nutki_28.jpg}
         \caption[]%
-        {{\small próbka 28 przed procesem}}
+        {{\small Rys. 42: Zdjęcie nr 28 przed procesem}}
         \label{fig:sub3}
     \end{subfigure}
     \quad
@@ -530,7 +540,7 @@ Następnie, korzystając z różnic pomiędzy kluczem wiolinowym, a kluczem baso
         \graphicspath{ {blobs/} }
         \includegraphics[width=\textwidth]{28_cnts.jpg}
         \caption[]%
-        {{\small próbka 28 wynik}}
+        {{\small Rys. 43: Zdjęcie nr 28 wynik}}
         \label{fig:sub 4}
     \end{subfigure}
     \label{fig 5}
@@ -540,12 +550,13 @@ Następnie, korzystając z różnic pomiędzy kluczem wiolinowym, a kluczem baso
 
 \begin{figure*}
     \centering
+    \captionsetup[subfigure]{labelformat=empty}
     \begin{subfigure}[b]{0.475\textwidth}
         \centering
         \graphicspath{ {Resources/} }
         \includegraphics[width=\textwidth]{nutki_30.jpg}
         \caption[]%
-        {{\small próbka 30 przed procesem}}
+        {{\small Rys. 44: Zdjęcie nr 30 przed procesem}}
         \label{fig:sub1}
     \end{subfigure}
     \hfill
@@ -554,7 +565,7 @@ Następnie, korzystając z różnic pomiędzy kluczem wiolinowym, a kluczem baso
         \graphicspath{ {blobs/} }
         \includegraphics[width=\textwidth]{30_cnts.jpg}
         \caption[]%
-        {{\small próbka 30 wynik}}
+        {{\small Rys. 45: Zdjęcie nr 30 wynik}}
         \label{fig:sub2}
     \end{subfigure}
     \vskip\baselineskip
@@ -563,7 +574,7 @@ Następnie, korzystając z różnic pomiędzy kluczem wiolinowym, a kluczem baso
         \graphicspath{ {Resources/} }
         \includegraphics[width=\textwidth]{nutki_31.jpg}
         \caption[]%
-        {{\small próbka 31 przed procesem}}
+        {{\small Rys. 46: Zdjęcie nr 31 przed procesem}}
         \label{fig:sub3}
     \end{subfigure}
     \quad
@@ -572,7 +583,7 @@ Następnie, korzystając z różnic pomiędzy kluczem wiolinowym, a kluczem baso
         \graphicspath{ {blobs/} }
         \includegraphics[width=\textwidth]{31_cnts.jpg}
         \caption[]%
-        {{\small próbka 31 wynik}}
+        {{\small Rys. 47: Zdjęcie nr 31 wynik}}
         \label{fig:sub 4}
     \end{subfigure}
     \label{fig 6}
