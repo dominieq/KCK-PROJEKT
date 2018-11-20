@@ -14,6 +14,8 @@
 \usepackage{graphicx}
 \usepackage{subcaption}
 \usepackage{float}
+\usepackage{mwe}
+\usepackage[section]{placeins}
 
 \begin{document}
 
@@ -182,7 +184,7 @@ przez kontur nuty (półnuta jest biała w środku - średnia wartość znacznie
     \end{figure}
 
 \subsection{Wykrywanie kluczy}
-Po skorzystaniu z utworzonych już funkcji do przekształcenia obrazu, znajdowania położenia każdej pięciolinii oraz usuwania ich z obraz pozostawiając możemy rozpocząć samo znajdowanie kluczy.
+Po skorzystaniu z utworzonych już funkcji do przekształcenia obrazu, znajdowania położenia każdej pięciolinii oraz usuwania ich z obrazu, możemy rozpocząć samo znajdowanie kluczy.
 Przy szukaniu kluczy korzystamy z wiedzy, że muszą się one zawsze znajdować na początku pięciolinii. Wyznaczmy więc potencjalne miejsce klucza, proporcjonalnie do jego rozmiarów.
 Następnie, korzystając z różnic pomiędzy kluczem wiolinowym, a kluczem basowym, będziemy przeszukiwać obszar pod pięciolinią. Szukamy pierwszego wystąpienia czarnego piksela. Jeśli jakiś się pojawił to znaczy że znaleźliśmy klucz wiolinowy, w przeciwnym wypadku znaleźliśmy klucz basowy.
 
@@ -200,341 +202,382 @@ Następnie, korzystając z różnic pomiędzy kluczem wiolinowym, a kluczem baso
         \includegraphics[width=.9\linewidth]{image_4.jpg}
         \label{figsub2}
     \end{subfigure}
+    \caption{Obraz oryginalny nr 4 i i ze znalezionymi kluczami (łatwe)}
     \label{figwykKlucze01}
 \end{figure}
-\begin{figure}[H]
+
+\begin{figure*}
     \centering
-    \begin{subfigure}{.5\textwidth}
+    \begin{subfigure}[b]{0.475\textwidth}
         \centering
         \graphicspath{ {Resources/} }
-        \includegraphics[width=.9\linewidth]{nutki_21.jpg}
-        \label{figsub1}
-    \end{subfigure}%
-    \begin{subfigure}{.5\textwidth}
+        \includegraphics[width=\textwidth]{nutki_17.jpg}
+        \caption[]%
+        {{\small Oryginalny obraz nr 17}}
+        \label{fig:sub1}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.475\textwidth}
         \centering
         \graphicspath{ {keys/} }
-        \includegraphics[width=.9\linewidth]{image_21.jpg}
-        \label{figsub2}
+        \includegraphics[width=\textwidth]{image_17.jpg}
+        \caption[]%
+        {{\small i ze znalezionymi kluczami (średnie)}}
+        \label{fig:sub2}
     \end{subfigure}
-    \caption{Obraz oryginalny i i ze znalezionymi kluczami}
-    \label{figwygKlucze02}
-\end{figure}
+    \vskip\baselineskip
+    \begin{subfigure}[b]{0.475\textwidth}
+        \centering
+        \graphicspath{ {Resources/} }
+        \includegraphics[width=\textwidth]{nutki_30.jpg}
+        \caption[]%
+        {{\small Oryginalny obraz nr 30}}
+        \label{fig:sub3}
+    \end{subfigure}
+    \quad
+    \begin{subfigure}[b]{0.475\textwidth}
+        \centering
+        \graphicspath{ {keys/} }
+        \includegraphics[width=\textwidth]{image_30.jpg}
+        \caption[]%
+        {{\small i ze znalezionymi kluczami (trudne)}}
+        \label{fig:sub 4}
+    \end{subfigure}
+    \label{fig 1}
+\end{figure*}
 
-\subsection{TO DO}
-Odpowiednie podpisywanie nut \newline
-Połączenie wykrywania klucza z wykrywaniem nut\newline
-Uszczególnienie parametrów podziału nut na całe/półnuty/ćwierćnuty/ósemki\newline
+\FloatBarrier
+
+%\subsection{TO DO}
+%Odpowiednie podpisywanie nut \newline
+%Połączenie wykrywania klucza z wykrywaniem nut\newline
+%Uszczególnienie parametrów podziału nut na całe/półnuty/ćwierćnuty/ósemki\newline
 
 
-\section{Tymczasowe wyniki}
+\section{Przykładowe wyniki}
 
 \subsection{Łatwe}
 
 \begin{figure}[H]
     \centering
-    \begin{subfigure}{.5\textwidth}
+    \begin{subfigure}[b]{0.475\textwidth}
         \centering
         \graphicspath{ {Resources/} }
-        \includegraphics[width=\linewidth]{nutki_04.jpg}
-        % \caption{Threshold}
+        \includegraphics[width=\textwidth]{nutki_04.jpg}
+        \caption[]%
+        {{\small próbka 4 przed procesem}}
         \label{fig:sub1}
-    \end{subfigure}%
-    \begin{subfigure}{.5\textwidth}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.475\textwidth}
         \centering
         \graphicspath{ {blobs/} }
-        \includegraphics[width=\linewidth]{4_cnts.jpg}
-        % \caption{Erozja}
+        \includegraphics[width=\textwidth]{4_cnts.jpg}
+        \caption[]%
+        {{\small próbka 4 wynik}}
         \label{fig:sub2}
     \end{subfigure}
-    % \caption{Obraz oryginalny i po wycięciu}
-    \label{fig:test}
 \end{figure}
 
-\begin{figure}[H]
-    \centering
-    \begin{subfigure}{.5\textwidth}
-        \centering
-        \graphicspath{ {Resources/} }
-        \includegraphics[width=\linewidth]{nutki_05.jpg}
-        % \caption{Threshold}
-        \label{fig:sub1}
-    \end{subfigure}%
-    \begin{subfigure}{.5\textwidth}
-        \centering
-        \graphicspath{ {blobs/} }
-        \includegraphics[width=\linewidth]{5_cnts.jpg}
-        % \caption{Erozja}
-        \label{fig:sub2}
-    \end{subfigure}
-    % \caption{Obraz oryginalny i po wycięciu}
-    \label{fig:test}
-\end{figure}
 
-\begin{figure}[H]
+\begin{figure*}
     \centering
-    \begin{subfigure}{.5\textwidth}
+    \begin{subfigure}[b]{0.475\textwidth}
         \centering
         \graphicspath{ {Resources/} }
-        \includegraphics[width=\linewidth]{nutki_06.jpg}
-        % \caption{Threshold}
+        \includegraphics[width=\textwidth]{nutki_05.jpg}
+        \caption[]%
+        {{\small próbka 5 przed procesem}}
         \label{fig:sub1}
-    \end{subfigure}%
-    \begin{subfigure}{.5\textwidth}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.475\textwidth}
         \centering
         \graphicspath{ {blobs/} }
-        \includegraphics[width=\linewidth]{6_cnts.jpg}
-        % \caption{Erozja}
+        \includegraphics[width=\textwidth]{5_cnts.jpg}
+        \caption[]%
+        {{\small próbka 5 wynik}}
         \label{fig:sub2}
     \end{subfigure}
-    % \caption{Obraz oryginalny i po wycięciu}
-    \label{fig:test}
-\end{figure}
+    \vskip\baselineskip
+    \begin{subfigure}[b]{0.475\textwidth}
+        \centering
+        \graphicspath{ {Resources/} }
+        \includegraphics[width=\textwidth]{nutki_06.jpg}
+        \caption[]%
+        {{\small próbka 6 przed procesem}}
+        \label{fig:sub3}
+    \end{subfigure}
+    \quad
+    \begin{subfigure}[b]{0.475\textwidth}
+        \centering
+        \graphicspath{ {blobs/} }
+        \includegraphics[width=\textwidth]{6_cnts.jpg}
+        \caption[]%
+        {{\small próbka 6 wynik}}
+        \label{fig:sub 4}
+    \end{subfigure}
+    \label{fig 1}
+\end{figure*}
 
-\begin{figure}[H]
-    \centering
-    \begin{subfigure}{.5\textwidth}
-        \centering
-        \graphicspath{ {Resources/} }
-        \includegraphics[width=\linewidth]{nutki_08.jpg}
-        % \caption{Threshold}
-        \label{fig:sub1}
-    \end{subfigure}%
-    \begin{subfigure}{.5\textwidth}
-        \centering
-        \graphicspath{ {blobs/} }
-        \includegraphics[width=\linewidth]{8_cnts.jpg}
-        % \caption{Erozja}
-        \label{fig:sub2}
-    \end{subfigure}
-    % \caption{Obraz oryginalny i po wycięciu}
-    \label{fig:test}
-\end{figure}
+\FloatBarrier
 
-\begin{figure}[H]
+\begin{figure*}
     \centering
-    \begin{subfigure}{.5\textwidth}
+    \begin{subfigure}[b]{0.475\textwidth}
         \centering
         \graphicspath{ {Resources/} }
-        \includegraphics[width=\linewidth]{nutki_13.jpg}
-        % \caption{Threshold}
+        \includegraphics[width=\textwidth]{nutki_08.jpg}
+        \caption[]%
+        {{\small próbka 8 przed procesem}}
         \label{fig:sub1}
-    \end{subfigure}%
-    \begin{subfigure}{.5\textwidth}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.475\textwidth}
         \centering
         \graphicspath{ {blobs/} }
-        \includegraphics[width=\linewidth]{13_cnts.jpg}
-        % \caption{Erozja}
+        \includegraphics[width=\textwidth]{8_cnts.jpg}
+        \caption[]%
+        {{\small próbka 8 wynik}}
         \label{fig:sub2}
     \end{subfigure}
-    % \caption{Obraz oryginalny i po wycięciu}
-    \label{fig:test}
-\end{figure}
+    \vskip\baselineskip
+    \begin{subfigure}[b]{0.475\textwidth}
+        \centering
+        \graphicspath{ {Resources/} }
+        \includegraphics[width=\textwidth]{nutki_13.jpg}
+        \caption[]%
+        {{\small próbka 13 przed procesem}}
+        \label{fig:sub3}
+    \end{subfigure}
+    \quad
+    \begin{subfigure}[b]{0.475\textwidth}
+        \centering
+        \graphicspath{ {blobs/} }
+        \includegraphics[width=\textwidth]{13_cnts.jpg}
+        \caption[]%
+        {{\small próbka 13 wynik}}
+        \label{fig:sub 4}
+    \end{subfigure}
+    \label{fig 2}
+\end{figure*}
+
+\FloatBarrier
 
 \subsection{Średnie}
 
 \begin{figure}[H]
     \centering
-    \begin{subfigure}{.5\textwidth}
+    \begin{subfigure}[b]{0.475\textwidth}
         \centering
         \graphicspath{ {Resources/} }
-        \includegraphics[width=\linewidth]{nutki_16.jpg}
-        % \caption{Threshold}
+        \includegraphics[width=\textwidth]{nutki_16.jpg}
+        \caption[]%
+        {{\small próbka 16 przed procesem}}
         \label{fig:sub1}
-    \end{subfigure}%
-    \begin{subfigure}{.5\textwidth}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.475\textwidth}
         \centering
         \graphicspath{ {blobs/} }
-        \includegraphics[width=\linewidth]{16_cnts.jpg}
-        % \caption{Erozja}
+        \includegraphics[width=\textwidth]{16_cnts.jpg}
+        \caption[]%
+        {{\small próbka 16 wynik}}
         \label{fig:sub2}
     \end{subfigure}
-    % \caption{Obraz oryginalny i po wycięciu}
-    \label{fig:test}
 \end{figure}
 
-\begin{figure}[H]
+
+\begin{figure*}
     \centering
-    \begin{subfigure}{.5\textwidth}
+    \begin{subfigure}[b]{0.475\textwidth}
         \centering
         \graphicspath{ {Resources/} }
-        \includegraphics[width=\linewidth]{nutki_17.jpg}
-        % \caption{Threshold}
+        \includegraphics[width=\textwidth]{nutki_17.jpg}
+        \caption[]%
+        {{\small próbka 17 przed procesem}}
         \label{fig:sub1}
-    \end{subfigure}%
-    \begin{subfigure}{.5\textwidth}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.475\textwidth}
         \centering
         \graphicspath{ {blobs/} }
-        \includegraphics[width=\linewidth]{17_cnts.jpg}
-        % \caption{Erozja}
+        \includegraphics[width=\textwidth]{17_cnts.jpg}
+        \caption[]%
+        {{\small próbka 17 wynik}}
         \label{fig:sub2}
     \end{subfigure}
-    % \caption{Obraz oryginalny i po wycięciu}
-    \label{fig:test}
-\end{figure}
+    \vskip\baselineskip
+    \begin{subfigure}[b]{0.475\textwidth}
+        \centering
+        \graphicspath{ {Resources/} }
+        \includegraphics[width=\textwidth]{nutki_20.jpg}
+        \caption[]%
+        {{\small próbka 20 przed procesem}}
+        \label{fig:sub3}
+    \end{subfigure}
+    \quad
+    \begin{subfigure}[b]{0.475\textwidth}
+        \centering
+        \graphicspath{ {blobs/} }
+        \includegraphics[width=\textwidth]{20_cnts.jpg}
+        \caption[]%
+        {{\small próbka 20 wynik}}
+        \label{fig:sub 4}
+    \end{subfigure}
+    \label{fig 3}
+\end{figure*}
 
-\begin{figure}[H]
+\FloatBarrier
+
+\begin{figure*}
     \centering
-    \begin{subfigure}{.5\textwidth}
+    \begin{subfigure}[b]{0.475\textwidth}
         \centering
         \graphicspath{ {Resources/} }
-        \includegraphics[width=\linewidth]{nutki_20.jpg}
-        % \caption{Threshold}
+        \includegraphics[width=\textwidth]{nutki_21.jpg}
+        \caption[]%
+        {{\small próbka 21 przed procesem}}
         \label{fig:sub1}
-    \end{subfigure}%
-    \begin{subfigure}{.5\textwidth}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.475\textwidth}
         \centering
         \graphicspath{ {blobs/} }
-        \includegraphics[width=\linewidth]{20_cnts.jpg}
-        % \caption{Erozja}
+        \includegraphics[width=\textwidth]{21_cnts.jpg}
+        \caption[]%
+        {{\small próbka 21 wynik}}
         \label{fig:sub2}
     \end{subfigure}
-    % \caption{Obraz oryginalny i po wycięciu}
-    \label{fig:test}
-\end{figure}
-
-\begin{figure}[H]
-    \centering
-    \begin{subfigure}{.5\textwidth}
+    \vskip\baselineskip
+    \begin{subfigure}[b]{0.475\textwidth}
         \centering
         \graphicspath{ {Resources/} }
-        \includegraphics[width=\linewidth]{nutki_21.jpg}
-        % \caption{Threshold}
-        \label{fig:sub1}
-    \end{subfigure}%
-    \begin{subfigure}{.5\textwidth}
+        \includegraphics[width=\textwidth]{nutki_41.jpg}
+        \caption[]%
+        {{\small próbka 41 przed procesem}}
+        \label{fig:sub3}
+    \end{subfigure}
+    \quad
+    \begin{subfigure}[b]{0.475\textwidth}
         \centering
         \graphicspath{ {blobs/} }
-        \includegraphics[width=\linewidth]{21_cnts.jpg}
-        % \caption{Erozja}
-        \label{fig:sub2}
+        \includegraphics[width=\textwidth]{41_cnts.jpg}
+        \caption[]%
+        {{\small próbka 41 wynik}}
+        \label{fig:sub 4}
     \end{subfigure}
-    % \caption{Obraz oryginalny i po wycięciu}
-    \label{fig:test}
-\end{figure}
+    \label{fig 4}
+\end{figure*}
 
-\begin{figure}[H]
-    \centering
-    \begin{subfigure}{.5\textwidth}
-        \centering
-        \graphicspath{ {Resources/} }
-        \includegraphics[width=\linewidth]{nutki_41.jpg}
-        % \caption{Threshold}
-        \label{fig:sub1}
-    \end{subfigure}%
-    \begin{subfigure}{.5\textwidth}
-        \centering
-        \graphicspath{ {blobs/} }
-        \includegraphics[width=\linewidth]{41_cnts.jpg}
-        % \caption{Erozja}
-        \label{fig:sub2}
-    \end{subfigure}
-    % \caption{Obraz oryginalny i po wycięciu}
-    \label{fig:test}
-\end{figure}
-
-
+\FloatBarrier
 
 \subsection{Trudne}
 
 \begin{figure}[H]
     \centering
-    \begin{subfigure}{.5\textwidth}
+    \begin{subfigure}[b]{0.475\textwidth}
         \centering
         \graphicspath{ {Resources/} }
-        \includegraphics[width=\linewidth]{nutki_26.jpg}
-        % \caption{Threshold}
+        \includegraphics[width=\textwidth]{nutki_26.jpg}
+        \caption[]%
+        {{\small próbka 26 przed procesem}}
         \label{fig:sub1}
-    \end{subfigure}%
-    \begin{subfigure}{.5\textwidth}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.475\textwidth}
         \centering
         \graphicspath{ {blobs/} }
-        \includegraphics[width=\linewidth]{26_cnts.jpg}
-        % \caption{Erozja}
+        \includegraphics[width=\textwidth]{26_cnts.jpg}
+        \caption[]%
+        {{\small próbka 26 wynik}}
         \label{fig:sub2}
     \end{subfigure}
-    % \caption{Obraz oryginalny i po wycięciu}
-    \label{fig:test}
 \end{figure}
 
-\begin{figure}[H]
+
+\begin{figure*}
     \centering
-    \begin{subfigure}{.5\textwidth}
+    \begin{subfigure}[b]{0.475\textwidth}
         \centering
         \graphicspath{ {Resources/} }
-        \includegraphics[width=\linewidth]{nutki_27.jpg}
-        % \caption{Threshold}
+        \includegraphics[width=\textwidth]{nutki_27.jpg}
+        \caption[]%
+        {{\small próbka 27 przed procesem}}
         \label{fig:sub1}
-    \end{subfigure}%
-    \begin{subfigure}{.5\textwidth}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.475\textwidth}
         \centering
         \graphicspath{ {blobs/} }
-        \includegraphics[width=\linewidth]{27_cnts.jpg}
-        % \caption{Erozja}
+        \includegraphics[width=\textwidth]{27_cnts.jpg}
+        \caption[]%
+        {{\small próbka 27 wynik}}
         \label{fig:sub2}
     \end{subfigure}
-    % \caption{Obraz oryginalny i po wycięciu}
-    \label{fig:test}
-\end{figure}
+    \vskip\baselineskip
+    \begin{subfigure}[b]{0.475\textwidth}
+        \centering
+        \graphicspath{ {Resources/} }
+        \includegraphics[width=\textwidth]{nutki_28.jpg}
+        \caption[]%
+        {{\small próbka 28 przed procesem}}
+        \label{fig:sub3}
+    \end{subfigure}
+    \quad
+    \begin{subfigure}[b]{0.475\textwidth}
+        \centering
+        \graphicspath{ {blobs/} }
+        \includegraphics[width=\textwidth]{28_cnts.jpg}
+        \caption[]%
+        {{\small próbka 28 wynik}}
+        \label{fig:sub 4}
+    \end{subfigure}
+    \label{fig 5}
+\end{figure*}
 
-\begin{figure}[H]
+\FloatBarrier
+
+\begin{figure*}
     \centering
-    \begin{subfigure}{.5\textwidth}
+    \begin{subfigure}[b]{0.475\textwidth}
         \centering
         \graphicspath{ {Resources/} }
-        \includegraphics[width=\linewidth]{nutki_28.jpg}
-        % \caption{Threshold}
+        \includegraphics[width=\textwidth]{nutki_30.jpg}
+        \caption[]%
+        {{\small próbka 30 przed procesem}}
         \label{fig:sub1}
-    \end{subfigure}%
-    \begin{subfigure}{.5\textwidth}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.475\textwidth}
         \centering
         \graphicspath{ {blobs/} }
-        \includegraphics[width=\linewidth]{28_cnts.jpg}
-        % \caption{Erozja}
+        \includegraphics[width=\textwidth]{30_cnts.jpg}
+        \caption[]%
+        {{\small próbka 30 wynik}}
         \label{fig:sub2}
     \end{subfigure}
-    % \caption{Obraz oryginalny i po wycięciu}
-    \label{fig:test}
-\end{figure}
-
-\begin{figure}[H]
-    \centering
-    \begin{subfigure}{.5\textwidth}
+    \vskip\baselineskip
+    \begin{subfigure}[b]{0.475\textwidth}
         \centering
         \graphicspath{ {Resources/} }
-        \includegraphics[width=\linewidth]{nutki_30.jpg}
-        % \caption{Threshold}
-        \label{fig:sub1}
-    \end{subfigure}%
-    \begin{subfigure}{.5\textwidth}
+        \includegraphics[width=\textwidth]{nutki_31.jpg}
+        \caption[]%
+        {{\small próbka 31 przed procesem}}
+        \label{fig:sub3}
+    \end{subfigure}
+    \quad
+    \begin{subfigure}[b]{0.475\textwidth}
         \centering
         \graphicspath{ {blobs/} }
-        \includegraphics[width=\linewidth]{30_cnts.jpg}
-        % \caption{Erozja}
-        \label{fig:sub2}
+        \includegraphics[width=\textwidth]{31_cnts.jpg}
+        \caption[]%
+        {{\small próbka 31 wynik}}
+        \label{fig:sub 4}
     \end{subfigure}
-    % \caption{Obraz oryginalny i po wycięciu}
-    \label{fig:test}
-\end{figure}
+    \label{fig 6}
+\end{figure*}
 
-\begin{figure}[H]
-    \centering
-    \begin{subfigure}{.5\textwidth}
-        \centering
-        \graphicspath{ {Resources/} }
-        \includegraphics[width=\linewidth]{nutki_31.jpg}
-        % \caption{Threshold}
-        \label{fig:sub1}
-    \end{subfigure}%
-    \begin{subfigure}{.5\textwidth}
-        \centering
-        \graphicspath{ {blobs/} }
-        \includegraphics[width=\linewidth]{31_cnts.jpg}
-        % \caption{Erozja}
-        \label{fig:sub2}
-    \end{subfigure}
-    % \caption{Obraz oryginalny i po wycięciu}
-    \label{fig:test}
-\end{figure}
-
+\FloatBarrier
 
 \end{document}
