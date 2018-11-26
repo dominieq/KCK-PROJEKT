@@ -43,9 +43,9 @@ def findKey(yHigh, yLow, x, y, img):
     return found, (xLeft, yHigh - propHigh)
 
 
+
 def processImage(index, img, staves, result):
     places, whatKey = [[], []]
-
     try:
         len(staves)
         img.shape        
