@@ -103,8 +103,12 @@ venv.bak/
 # mypy
 .mypy_cache/
 
-joined.py
-staffs
-lines
-turned
 blobs
+examples
+keys
+output
+Resources
+spraw
+staffs
+turned
+__pycache__
